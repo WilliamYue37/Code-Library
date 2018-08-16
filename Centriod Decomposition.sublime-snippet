@@ -1,0 +1,67 @@
+<snippet>
+	<content><![CDATA[
+int parent[MAXN], subtreeSize[MAXN];
+bool blocked[MAXN];
+queue<int> q;
+
+void calcSize(int i, int p) {
+	parent[i] = p;
+	subtreeSize[i] = 1;
+
+	for (ii e: adjList[i]) {
+		if (e.first != p && !blocked[e.first]) {
+			calcSize(e.first, i);
+			subtreeSize[i] += subtreeSize[e.first];
+		}
+	}
+}
+
+ll solveTree(int root, int compSize) {
+	return 0;
+}
+
+ll go(int entryPoint) {
+	calcSize(entryPoint, entryPoint);
+
+	int centroid = entryPoint;
+	int bestSize = subtreeSize[entryPoint];
+
+	int compSize = 0;
+	q.push(entryPoint);
+	while (!q.empty()) {
+		int i = q.front(); q.pop();
+		++compSize;
+
+		int size = subtreeSize[entryPoint] - subtreeSize[i];
+
+		for (ii e: adjList[i]) {
+			if (e.first != parent[i] && !blocked[e.first]) {
+				size = max(size, subtreeSize[e.first]);
+				q.push(e.first);
+			}
+		}
+
+		if (size < bestSize) {
+			centroid = i;
+			bestSize = size;
+		}
+	}
+
+	ll ways = solveTree(centroid, compSize);
+
+	blocked[centroid] = true;
+	for (ii e: adjList[centroid]) {
+		if (!blocked[e.first]) {
+			ways += go(e.first);
+		}
+	}
+
+	return ways;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>centroidDecomp</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Centriod Decomposition</description>
+</snippet>
