@@ -16,7 +16,7 @@ void calcSize(int i, int p) {
 	}
 }
 
-ll solveTree(int root, int compSize) {
+ll solveTree(int root) {
 	return 0;
 }
 
@@ -26,11 +26,9 @@ ll go(int entryPoint) {
 	int centroid = entryPoint;
 	int bestSize = subtreeSize[entryPoint];
 
-	int compSize = 0;
 	q.push(entryPoint);
 	while (!q.empty()) {
 		int i = q.front(); q.pop();
-		++compSize;
 
 		int size = subtreeSize[entryPoint] - subtreeSize[i];
 
@@ -47,7 +45,7 @@ ll go(int entryPoint) {
 		}
 	}
 
-	ll ways = solveTree(centroid, compSize);
+	ll ways = solveTree(centroid);
 
 	blocked[centroid] = true;
 	for (ii e: adjList[centroid]) {
