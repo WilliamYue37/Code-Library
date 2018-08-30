@@ -5,7 +5,7 @@ string T; //inputed string
 int RA[MAXN], tempRA[MAXN]; //Rank
 int SA[MAXN], tempSA[MAXN]; //Suffix Array
 int c[MAXN]; //used for radix sort
-vector<int> owner; //stores the owner of the first string in suffix_i; owner of special characters ($, ?, %) is -1; !NOTE! - has to be computed in main method when inputing strings
+vector<int> owner; //stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
 
 int M; //length of pattern string
 string P; //pattern string (for string matching)
