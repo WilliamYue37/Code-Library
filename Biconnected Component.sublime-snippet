@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 vector<int> adjList[MAXSIZE]; //adjacency list for the grid
-vector<set<int>> BCCs; //the BCCs of each node in the grid
+set<int> BCCs[MAXSIZE]; //the BCCs of each node in the grid
 int counter, rootChildren, counterBCC; //counter = counter for DFSLowLink, rootChildren = # of children for root node, counterBCC = id for BCCs
 int pre[MAXSIZE], low[MAXSIZE], parent[MAXSIZE]; //pre, low, and parent vectors for DFSLowLink
 stack<Edge> st; //stack for edges during DFSLowLink
