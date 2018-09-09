@@ -24,9 +24,7 @@ void DFSLowLink(int u) {
 		if (pre[v] == -1) {
 			parent[v] = u;
 			st.push({u, v});
-			if (pre[u] == 0) {
-				++rootChildren;
-			}
+			if (pre[u] == 0) ++rootChildren;
 			DFSLowLink(v);
 			if ((pre[u] == 0 && rootChildren > 1) || (pre[u] != 0 && pre[u] <= low[v])) {
 				vector<Edge> BCC;
@@ -39,8 +37,10 @@ void DFSLowLink(int u) {
 			low[u] = min(low[u], low[v]);
 		}
 		else if (parent[u] != v) {
-			low[u] = min(low[u], pre[v]);
-			st.push({u, v});
+            if (pre[v] < low[u]) {
+            	low[u] = pre[v];
+            	st.push({ u, v });
+            }
 		}
 	}
 }
