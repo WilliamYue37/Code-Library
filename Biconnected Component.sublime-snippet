@@ -4,42 +4,35 @@ vector<int> adjList[MAXSIZE]; //adjacency list for the grid
 set<int> BCCs[MAXSIZE]; //the BCCs of each node in the grid
 int counter, rootChildren, counterBCC; //counter = counter for DFSLowLink, rootChildren = # of children for root node, counterBCC = id for BCCs
 int pre[MAXSIZE], low[MAXSIZE], parent[MAXSIZE]; //pre, low, and parent vectors for DFSLowLink
-stack<Edge> st; //stack for edges during DFSLowLink
-
-//insert BCCs into BCCs data stucture
-void parseBCC(vector<Edge> &BCC) {
-	for (Edge &e : BCC) {
-		int u = e.u, v = e.v;
-		BCCs[u].insert(counterBCC);
-		BCCs[v].insert(counterBCC);
-	}
-	++counterBCC;
-}
+stack<Edge*> st; //stack for edges during DFSLowLink
 
 //DFSLowLink to find data structures
 void DFSLowLink(int u) {
 	pre[u] = low[u] = counter++;
 	for (int i = 0; i < (int)adjList[u].size(); ++i) {
-		int v = adjList[u][i];
+		Edge* e = &adjList[u][i]; int v = e->v;
 		if (pre[v] == -1) {
 			parent[v] = u;
-			st.push({u, v});
+			st.push(e);
 			if (pre[u] == 0) ++rootChildren;
 			DFSLowLink(v);
 			if ((pre[u] == 0 && rootChildren > 1) || (pre[u] != 0 && pre[u] <= low[v])) {
-				vector<Edge> BCC;
-				while (st.top().u != u || st.top().v != v) {
-					BCC.push_back(st.top()); st.pop();
+				while (st.top()->u != u || st.top()->v != v) {
+					Edge* e = st.top(); st.pop();
+					BCCs[e->u].insert(counterBCC);
+					BCCs[e->v].insert(counterBCC);						
 				}
-				BCC.push_back(st.top()); st.pop();
-				if (BCC.size() > 1) parseBCC(BCC);
+				Edge* e = st.top(); st.pop();
+				BCCs[e->u].insert(counterBCC);
+				BCCs[e->v].insert(counterBCC);
+				++counterBCC;
 			}
 			low[u] = min(low[u], low[v]);
 		}
 		else if (parent[u] != v) {
             if (pre[v] < low[u]) {
             	low[u] = pre[v];
-            	st.push({ u, v });
+            	st.push(e);
             }
 		}
 	}
