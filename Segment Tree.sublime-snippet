@@ -4,6 +4,8 @@ class SegmentTree {
 public:
 	int n;
 	int lo[4*MAXN+1], hi[4*MAXN+1], minimum[4*MAXN+1], delta[4*MAXN+1];
+
+	SegmentTree() {}
 	
 	SegmentTree(int n) {
 		this->n = n;
