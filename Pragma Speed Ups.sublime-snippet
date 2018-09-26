@@ -1,8 +1,10 @@
 <snippet>
 	<content><![CDATA[
-#pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+#pragma comment(linker, "/stack:200000000") //can slow down program
+#pragma GCC optimize("Ofast") //most useful
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native") //can slow down program
+#pragma GCC optimize ("O3")
+#pragma GCC target ("sse4")
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>pragma</tabTrigger>
