@@ -18,7 +18,7 @@ double get(pair<int, int> x, pair<int, int> y, int z) {
 bool inPolygon(pair<int, int> z) {
     int ans = 0;
     for (int i = 0; i < N; ++i) {
-        pair<int, int> x = points[i], y = points[(i+1)%4];
+        pair<int, int> x = points[i], y = points[(i+1) % N];
         if (on(x, y, z)) return true;
         if (x.second > y.second) swap(x, y);
         if (x.second <= z.second && y.second > z.second) {
