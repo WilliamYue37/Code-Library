@@ -1,0 +1,33 @@
+<snippet>
+	<content><![CDATA[
+int dist[MAXN];
+int bellmanFord(bool &hasNegativeCycle) {
+	fill(dist, dist + MAXN, MAX);
+	dist[1] = 0;
+	for (int i = 0; i < N - 1; ++i) {
+		for (int u = 1; u <= N; ++u) {
+			for (int j = 0; j < adjList[u].size(); ++j) {
+				pair<int, int> v = adjList[u][j];
+				dist[v.first] = min(dist[v.first], dist[u] + v.second);
+			}
+		}
+	}
+
+	for (int u = 1; u <= N; ++u) {
+		for (int j = 0; j < adjList[u].size(); ++j) {
+			pair<int, int> v = adjList[u][j];
+			if (dist[v.first] > dist[u] + v.second) {
+				hasNegativeCycle = true;
+			}
+		}
+	}
+
+	return dist[N];
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>bellmanFord</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Bellman Ford</description>
+</snippet>

@@ -1,0 +1,25 @@
+<snippet>
+	<content><![CDATA[
+#include <bits/stdc++.h>
+
+using namespace std;
+
+typedef long long ll;
+typedef pair<int, int> ii;
+
+int main() {
+	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin);
+	freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
+	ios_base::sync_with_stdio(false); cin.tie(NULL);
+	
+	$1
+
+	return 0;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>usaco</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>USA Computing Olympiad</description>
+</snippet>

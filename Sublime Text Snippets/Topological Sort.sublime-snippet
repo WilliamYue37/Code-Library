@@ -1,0 +1,25 @@
+<snippet>
+	<content><![CDATA[
+int degree[MAXN];
+queue<int> q;
+void topologicalSort(vector<int> &ordering) {
+	for (int u = 1; u <= N; ++u) {
+		if (degree[u] == 0) q.push(u);
+	}
+	while (!q.empty()) {
+		int u = q.front(); q.pop();
+		ordering.push_back(u);
+		for (int i = 0; i < adjList[u].size(); ++i) {
+			int v = adjList[u][i];
+			--degree[v];
+			if (degree[v] == 0) q.push(v);
+		}
+	}
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>topSort</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Topological Sort</description>
+</snippet>

@@ -1,0 +1,16 @@
+<snippet>
+	<content><![CDATA[
+struct Edge {
+	int u, v, w;
+
+	bool operator < (const Edge &e) const {
+		return this->w < e.w;
+	}
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>edge</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Edge Struct</description>
+</snippet>
