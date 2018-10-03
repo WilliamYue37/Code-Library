@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+#define START auto start = high_resolution_clock::now();
+#define STARTn start = high_resolution_clock::now();
+#define STOP auto stop = high_resolution_clock::now();auto span = duration_cast<milliseconds>(stop - start);cout << "Time: " << span.count() << "ms\n";
+using namespace std::chrono;
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>timer</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Timer</description>
+</snippet>
