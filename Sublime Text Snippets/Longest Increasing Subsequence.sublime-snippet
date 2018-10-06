@@ -1,0 +1,31 @@
+<snippet>
+	<content><![CDATA[
+int A[MAXN], L[MAXN], L_id[MAXN], prev[MAXN];
+stack<int> stk;
+
+void LIS() {
+	int lis = 0, lis_end = 0;
+	for (int i = 0; i < N; ++i) {
+		int pos = lower_bound(L, L + lis, A[i]) - L;
+		L[pos] = A[i];
+		L_id[pos] = i;
+		prev[i] = (pos ? L_id[pos - 1] : -1);
+		if (pos + 1 > lis) {
+			lis = pos + 1;
+			lisEnd = i;
+		}
+	}
+}
+
+void reconstructLIS(int end) {
+	int i;
+	for (i = end; prev[i] >= 0; i = prev[i]) stk.push(A[i]);
+	stk.push(A[i]);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>lis</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Longest Increasing Subsequence</description>
+</snippet>
