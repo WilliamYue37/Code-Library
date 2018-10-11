@@ -3,7 +3,7 @@
 int A[MAXN], L[MAXN], L_id[MAXN], prev[MAXN];
 stack<int> stk;
 
-void LIS() {
+int LIS() {
 	int lis = 0, lis_end = 0;
 	for (int i = 0; i < N; ++i) {
 		int pos = lower_bound(L, L + lis, A[i]) - L;
@@ -15,6 +15,7 @@ void LIS() {
 			lisEnd = i;
 		}
 	}
+	return lis;
 }
 
 void reconstructLIS(int end) {
