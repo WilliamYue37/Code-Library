@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 cout << "\nSTART DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG\n";
-cout << $1 << "\n";
+cout << $0 << "\n";
 cout << "END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG\n\n";
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->

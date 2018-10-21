@@ -47,7 +47,7 @@ bool sameBCC(int u, int v) {
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>BCC</tabTrigger>
+	<tabTrigger>bcc</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
 	<description>Biconnected Component</description>

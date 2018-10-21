@@ -18,7 +18,7 @@ void topologicalSort(vector<int> &ordering) {
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>topSort</tabTrigger>
+	<tabTrigger>topologicalSort</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
 	<description>Topological Sort</description>
