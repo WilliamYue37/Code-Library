@@ -2,22 +2,18 @@
 	<content><![CDATA[
 class SegmentTree {
 public:
-	int n;
 	int lo[4*MAXN+1], hi[4*MAXN+1], minimum[4*MAXN+1], delta[4*MAXN+1];
 
-	SegmentTree() {}
-	
-	SegmentTree(int n) {
-		this->n = n;
-		init(1, 0, n-1);
+	SegmentTree() {
+		init(1, 0, MAXN-1);
 	}
 	
-	void increment(int a, int b, int val) {
-		increment(1, a, b, val);
+	void update(int a, int b, int val) {
+		update(1, a, b, val);
 	}
 	
-	int getMin(int a, int b) {
-		return getMin(1, a, b);
+	int query(int a, int b) {
+		return query(1, a, b);
 	}
 	
 	void init(int i, int a, int b) {
@@ -32,17 +28,7 @@ public:
 		init(2*i+1, m+1, b);
 	}
 	
-	void prop(int i) {
-		delta[2*i] += delta[i];
-		delta[2*i+1] += delta[i];
-		delta[i] = 0;
-	}
-	
-	void update(int i) {
-		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
-	}
-	
-	void increment(int i, int a, int b, int val) {
+	void update(int i, int a, int b, int val) {
 		if (b < lo[i] || hi[i] < a) 
 			return;
 		
@@ -51,15 +37,19 @@ public:
 			return;
 		}
 		
-		prop(i);
+		//prop
+		delta[2*i] += delta[i];
+		delta[2*i+1] += delta[i];
+		delta[i] = 0;
 		
-		increment(2*i, a, b, val);
-		increment(2*i+1, a, b, val);
+		update(2*i, a, b, val);
+		update(2*i+1, a, b, val);
 		
-		update(i);
+		//update
+		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
 	}
 	
-	int getMin(int i, int a, int b) {
+	int query(int i, int a, int b) {
 		if (b < lo[i] || hi[i] < a) 
 			return (1 << 29);
 		
@@ -67,12 +57,17 @@ public:
 			return minimum[i] + delta[i];
 		}
 		
-		prop(i);
+		//prop
+		delta[2*i] += delta[i];
+		delta[2*i+1] += delta[i];
+		delta[i] = 0;
+
+		//recursion
+		int minLeft = query(2*i, a, b);
+		int minRight = query(2*i+1, a, b);
 		
-		int minLeft = getMin(2*i, a, b);
-		int minRight = getMin(2*i+1, a, b);
-		
-		update(i);
+		//update
+		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
 		
 		return min(minLeft, minRight);
 	}

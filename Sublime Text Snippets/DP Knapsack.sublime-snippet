@@ -1,0 +1,23 @@
+<snippet>
+	<content><![CDATA[
+int N, S;
+pi items[MAXN]; //(size, value);
+int dp[MAXS];
+
+int knapsack() {
+    int ans = 0;
+    for (int i = 0; i < N; ++i) {
+        for (int j = S; j >= 0; j) {
+            if (j - items[i].f >= 0) dp[j] = max(dp[j], dp[j - items[i].f] + items[i].s);
+            ans = max(ans, dp[j]);
+        }
+    }
+    return ans;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>knapsack</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>DP Knapsack</description>
+</snippet>
