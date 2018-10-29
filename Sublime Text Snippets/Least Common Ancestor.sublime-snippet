@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-int depth[MAXN], parent[MAXN][MAXLOG]; //1-indexed
+int depth[MAXN], parent[MAXN][MAXLOG]; //must be 1-indexed
 
 void DFS(int u, int p, int d) {
 	depth[u] = d; parent[u][0] = p;
