@@ -4,8 +4,8 @@
 
 using namespace std;
 
-#define f first
-#define s second
+#define ff first
+#define ss second
 
 typedef long long ll;
 typedef pair<int, int> pi;
