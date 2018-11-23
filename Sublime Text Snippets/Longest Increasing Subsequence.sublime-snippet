@@ -1,15 +1,15 @@
 <snippet>
 	<content><![CDATA[
-int A[MAXN], L[MAXN], L_id[MAXN], prev[MAXN];
+int A[MAXN], L[MAXN], L_id[MAXN], prev_id[MAXN]; //negate values in array A for longest decreasing subsequence
 stack<int> stk;
 
 int LIS() {
 	int lis = 0, lisEnd = 0;
 	for (int i = 0; i < N; ++i) {
-		int pos = lower_bound(L, L + lis, A[i]) - L;
+		int pos = lower_bound(L, L + lis, A[i]) - L; //change to upper_bound to go from increasing to non-decreasing
 		L[pos] = A[i];
 		L_id[pos] = i;
-		prev[i] = (pos ? L_id[pos - 1] : -1);
+		prev_id[i] = (pos ? L_id[pos - 1] : -1);
 		if (pos + 1 > lis) {
 			lis = pos + 1;
 			lisEnd = i;
@@ -20,7 +20,7 @@ int LIS() {
 
 void reconstructLIS(int end) {
 	int i;
-	for (i = end; prev[i] >= 0; i = prev[i]) stk.push(A[i]);
+	for (i = end; prev_id[i] >= 0; i = prev_id[i]) stk.push(A[i]);
 	stk.push(A[i]);
 }
 ]]></content>
