@@ -2,7 +2,7 @@
 	<content><![CDATA[
 class SegmentTree {
 public:
-	int lo[4*MAXN+1], hi[4*MAXN+1], minimum[4*MAXN+1], delta[4*MAXN+1];
+	int lo[4*MAXN+1], hi[4*MAXN+1], sum[4*MAXN+1], delta[4*MAXN+1];
 
 	SegmentTree() {
 		init(1, 0, MAXN-1);
@@ -35,7 +35,7 @@ public:
 	}
 
 	void pull(int i) {
-		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
+		sum[i] = sum[2*i] + delta[2*i] + sum[2*i+1] + delta[2*i+1];
 	}
 	
 	void update(int i, int a, int b, int val) {
@@ -47,13 +47,11 @@ public:
 			return;
 		}
 		
-		//prop
 		push(i);
 		
 		update(2*i, a, b, val);
 		update(2*i+1, a, b, val);
 		
-		//update
 		pull(i);
 	}
 	
@@ -62,20 +60,17 @@ public:
 			return (1 << 29);
 		
 		if (a <= lo[i] && hi[i] <= b) {
-			return minimum[i] + delta[i];
+			return sum[i] + delta[i];
 		}
 		
-		//prop
 		push(i);
 
-		//recursion
-		int minLeft = query(2*i, a, b);
-		int minRight = query(2*i+1, a, b);
+		int sumLeft = query(2*i, a, b);
+		int sumRight = query(2*i+1, a, b);
 		
-		//update
 		pull(i);
 		
-		return min(minLeft, minRight);
+		return sumLeft + sumRight;
 	}
 };
 ]]></content>
