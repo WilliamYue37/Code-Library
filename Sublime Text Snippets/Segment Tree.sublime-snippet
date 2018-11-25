@@ -27,6 +27,16 @@ public:
 		init(2*i, a, m);
 		init(2*i+1, m+1, b);
 	}
+
+	void push(int i) {
+		delta[2*i] += delta[i];
+		delta[2*i+1] += delta[i];
+		delta[i] = 0;
+	}
+
+	void pull(int i) {
+		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
+	}
 	
 	void update(int i, int a, int b, int val) {
 		if (b < lo[i] || hi[i] < a) 
@@ -38,15 +48,13 @@ public:
 		}
 		
 		//prop
-		delta[2*i] += delta[i];
-		delta[2*i+1] += delta[i];
-		delta[i] = 0;
+		push(i);
 		
 		update(2*i, a, b, val);
 		update(2*i+1, a, b, val);
 		
 		//update
-		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
+		pull(i);
 	}
 	
 	int query(int i, int a, int b) {
@@ -58,16 +66,14 @@ public:
 		}
 		
 		//prop
-		delta[2*i] += delta[i];
-		delta[2*i+1] += delta[i];
-		delta[i] = 0;
+		push(i);
 
 		//recursion
 		int minLeft = query(2*i, a, b);
 		int minRight = query(2*i+1, a, b);
 		
 		//update
-		minimum[i] = min(minimum[2*i] + delta[2*i], minimum[2*i+1] + delta[2*i+1]);
+		pull(i);
 		
 		return min(minLeft, minRight);
 	}
