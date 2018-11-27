@@ -2,7 +2,7 @@
 	<content><![CDATA[
 class SegmentTree {
 public:
-	int lo[4*MAXN+1], hi[4*MAXN+1], sum[4*MAXN+1], delta[4*MAXN+1];
+	int lo[4 * MAXN + 1], hi[4 * MAXN + 1], sum[4 * MAXN + 1], delta[4 * MAXN + 1];
 
 	SegmentTree() {
 		init(1, 0, MAXN-1);
@@ -20,28 +20,25 @@ public:
 		lo[i] = a;
 		hi[i] = b;
 		
-		if (a == b) 
-			return;
+		if (a == b) return;
 		
 		int m = (a+b)/2;
-		init(2*i, a, m);
-		init(2*i+1, m+1, b);
+		init(2 * i, a, m);
+		init(2 * i + 1, m + 1, b);
 	}
 
 	void push(int i) {
-		delta[2*i] += delta[i];
-		delta[2*i+1] += delta[i];
+		delta[2 * i] += delta[i];
+		delta[2 * i + 1] += delta[i];
 		delta[i] = 0;
 	}
 
 	void pull(int i) {
-		sum[i] = sum[2*i] + delta[2*i] + sum[2*i+1] + delta[2*i+1];
+		sum[i] = sum[2 * i] + delta[2 * i] + sum[2 * i + 1] + delta[2 * i + 1];
 	}
 	
 	void update(int i, int a, int b, int val) {
-		if (b < lo[i] || hi[i] < a) 
-			return;
-		
+		if (b < lo[i] || hi[i] < a) return;
 		if (a <= lo[i] && hi[i] <= b) {
 			delta[i] += val;
 			return;
@@ -49,24 +46,22 @@ public:
 		
 		push(i);
 		
-		update(2*i, a, b, val);
-		update(2*i+1, a, b, val);
+		update(2 * i, a, b, val);
+		update(2 * i + 1, a, b, val);
 		
 		pull(i);
 	}
 	
 	int query(int i, int a, int b) {
-		if (b < lo[i] || hi[i] < a) 
-			return (1 << 29);
-		
+		if (b < lo[i] || hi[i] < a) return (1 << 29);
 		if (a <= lo[i] && hi[i] <= b) {
 			return sum[i] + delta[i];
 		}
 		
 		push(i);
 
-		int sumLeft = query(2*i, a, b);
-		int sumRight = query(2*i+1, a, b);
+		int sumLeft = query(2 * i, a, b);
+		int sumRight = query(2 * i + 1, a, b);
 		
 		pull(i);
 		
