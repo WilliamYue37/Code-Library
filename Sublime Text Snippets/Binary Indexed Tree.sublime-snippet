@@ -4,8 +4,8 @@ class BIT {
 public:
 	int BIT[${1:size}];
 
-	int query(int index) {
-		++index; int sum = 0;
+	int query(int index) { //index must be 1-indexed
+		int sum = 0;
 		while (index > 0) {
 			sum += BIT[index];
 			index -= index & -index;
@@ -13,8 +13,7 @@ public:
 		return sum;
 	}
 
-	void update(int index, int val) {
-		++index;
+	void update(int index, int val) { //index must be 1-indexed
 		while (index <= ${1:size}) {
 			BIT[index] += val;
 			index += index & -index;
