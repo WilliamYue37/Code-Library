@@ -66,7 +66,7 @@ void computeLCP() {
 	}
 }
 
-pi stringMatching() {
+ii stringMatching() {
 	int lo = 0, hi = N - 1, mid = lo;
 	while (lo < hi) {
 		mid = (lo + hi) / 2;
@@ -74,8 +74,8 @@ pi stringMatching() {
 		if (res >= 0) hi = mid;
 		else lo = mid + 1;
 	}
-	if (T.compare(SA[lo], T.length() - SA[lo], P) != 0) return pi(-1, -1);
-	pi ans; ans.first = lo;
+	if (T.compare(SA[lo], T.length() - SA[lo], P) != 0) return ii(-1, -1);
+	ii ans; ans.first = lo;
 	lo = 0; hi = N - 1; mid = lo;
 	while (lo < hi) {
 		mid = (lo + hi) / 2;
@@ -88,24 +88,24 @@ pi stringMatching() {
 	return ans;
 }
 
-pi LRS() {
+ii LRS() {
 	int idx = 0, maxLCP = -1;
 	for (int i = 1; i < N; ++i) {
 		if (LCP[i] > maxLCP) {
 			maxLCP = LCP[i], idx = i;
 		}
 	}
-	return pi(maxLCP, idx);
+	return ii(maxLCP, idx);
 }
 
-pi LCS() {
+ii LCS() {
 	int idx = 0, maxLCP = -1;
 	for (int i = 1; i < N; ++i) {
 		if (owner[SA[i]] != owner[SA[i - 1]] && LCP[i] > maxLCP) {
 			maxLCP = LCP[i], idx = i;
 		}
 	}
-	return pi(maxLCP, idx);
+	return ii(maxLCP, idx);
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->

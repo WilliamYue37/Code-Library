@@ -15,7 +15,7 @@ struct Matrix {
         }
     }
     
-    Matrix(vector<vector<ll>> v) : Matrix(v.size(), v[0].size()) {
+    Matrix(vector<vector<int>> v) : Matrix(v.size(), v[0].size()) {
         for (int i = 0; i < a; ++i) for (int j = 0; j < b; ++j) mat[i][j] = v[i][j];
     }
     

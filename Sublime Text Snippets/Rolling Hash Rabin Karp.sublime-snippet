@@ -48,5 +48,5 @@ public:
 	<tabTrigger>rollingHash</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<description>Rabin Karp Rolling Hash</description>
+	<description>Rolling Hash Rabin Karp</description>
 </snippet>
