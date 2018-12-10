@@ -308,7 +308,7 @@ struct BigInteger {
         return stream;
     }
 
-    BigInteger pow(const BigInteger &base, const BigInteger &exponent) const {
+    static BigInteger pow(const BigInteger &base, const BigInteger &exponent) {
         if (exponent == 0) return 1;
         if (exponent == 1) return BigInteger(base);
         BigInteger ans = pow(base, exponent / 2);

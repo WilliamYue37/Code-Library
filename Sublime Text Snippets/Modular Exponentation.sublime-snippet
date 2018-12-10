@@ -1,12 +1,12 @@
 <snippet>
 	<content><![CDATA[
-ll modExpo(int num, int e) {
-	if (e == 0) return 1;
-	if (e == 1) return num;
-	ll ans = modExpo(num, e / 2);
-	ans = ans * ans % MOD;
-	if (e % 2 == 1) ans = ans * num % MOD;
-	return (int)ans;
+ll modExpo(int base, int e) {
+    if (e == 0) return 1;
+    if (e == 1) return base;
+    ll ans = modExpo(base, e / 2);
+    ans = ans * ans % MOD;
+    if (e % 2 == 1) ans = ans * base % MOD;
+    return (int)ans;
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
