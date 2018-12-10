@@ -308,6 +308,15 @@ struct BigInteger {
         return stream;
     }
 
+    BigInteger pow(const BigInteger &base, const BigInteger &exponent) const {
+        if (exponent == 0) return 1;
+        if (exponent == 1) return BigInteger(base);
+        BigInteger ans = pow(base, exponent / 2);
+        ans = ans * ans;
+        if (exponent % 2 == 1) ans = ans * base;
+        return ans;
+    }
+
     static vector<int> convert_base(const vector<int> &a, int old_digits, int new_digits) {
         vector<long long> p(max(old_digits, new_digits) + 1);
         p[0] = 1;
