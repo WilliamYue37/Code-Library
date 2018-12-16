@@ -3,17 +3,12 @@
 class SegmentTree {
 public:
 	int lo[4 * MAXN + 1], hi[4 * MAXN + 1], minimum[4 * MAXN + 1], delta[4 * MAXN + 1];
-	SegmentTree() {
-		init(1, 0, MAXN-1);
-	}
+
+	SegmentTree() {init(1, 0, MAXN-1);}
 	
-	void update(int a, int b, int val) {
-		update(1, a, b, val);
-	}
+	void update(int a, int b, int val) {update(1, a, b, val);}
 	
-	int query(int a, int b) {
-		return query(1, a, b);
-	}
+	int query(int a, int b) {return query(1, a, b);}
 	
 	void init(int i, int a, int b) {
 		lo[i] = a;
@@ -58,6 +53,7 @@ public:
 		}
 		
 		push(i);
+		
 		int minLeft = query(2 * i, a, b);
 		int minRight = query(2 * i + 1, a, b);
 		
