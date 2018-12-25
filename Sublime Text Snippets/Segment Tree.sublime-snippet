@@ -9,9 +9,9 @@ public:
 		//init(1, 0, MAXN-1);
 	}
 	
-	void update(int r, int l, int val) {update(1, 0, MAXN - 1, r, l, val);} //inclusive range
+	void update(int l, int r, int val) {update(1, 0, MAXN - 1, l, r, val);} //inclusive range
 	
-	int query(int r, int l) {return query(1, 0, MAXN - 1, r, l);} //inclusive range
+	int query(int l, int r) {return query(1, 0, MAXN - 1, l, r);} //inclusive range
 	
 	void init(int i, int lo, int hi) {
 		//if default segtree values are not zero, initialize node i
@@ -32,9 +32,9 @@ public:
 		minimum[i] = min(minimum[2 * i] + delta[2 * i], minimum[2 * i + 1] + delta[2 * i + 1]);
 	}
 	
-	void update(int i, int lo, int hi, int r, int l, int val) {
-		if (l < lo || hi < r) return;
-		if (r <= lo && hi <= l) {
+	void update(int i, int lo, int hi, int l, int r, int val) {
+		if (r < lo || hi < l) return;
+		if (l <= lo && hi <= r) {
 			delta[i] += val;
 			return;
 		}
@@ -42,23 +42,23 @@ public:
 		push(i);
 		
 		int m = (lo + hi) / 2;
-		update(2 * i, lo, m, r, l, val);
-		update(2 * i + 1, m + 1, hi, r, l, val);
+		update(2 * i, lo, m, l, r, val);
+		update(2 * i + 1, m + 1, hi, l, r, val);
 		
 		pull(i);
 	}
 	
-	int query(int i, int lo, int hi, int r, int l) {
-		if (l < lo || hi < r) return (1 << 29);
-		if (r <= lo && hi <= l) {
+	int query(int i, int lo, int hi, int l, int r) {
+		if (r < lo || hi < l) return (1 << 29);
+		if (l <= lo && hi <= r) {
 			return minimum[i] + delta[i];
 		}
 		
 		push(i);
 		
 		int m = (lo + hi) / 2;
-		int minLeft = query(2 * i, lo, m, r, l);
-		int minRight = query(2 * i + 1, m + 1, hi, r, l);
+		int minLeft = query(2 * i, lo, m, l, r);
+		int minRight = query(2 * i + 1, m + 1, hi, l, r);
 		
 		pull(i);
 		
