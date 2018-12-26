@@ -2,16 +2,20 @@
 	<content><![CDATA[
 class SegmentTree {
 public:
-	int minimum[4 * MAXN + 1], delta[4 * MAXN + 1];
+	int N;
+	vector<int> minimum, delta;
 
-	SegmentTree() {
+	SegmentTree(int N) {
+		this->N = N;
+		minimum = vector<int>(N);
+		delta = vector<int>(N);
 		//you don't need to init unless default values are not zero
-		//init(1, 0, MAXN-1);
+		//init(1, 0, N - 1);
 	}
 	
-	void update(int l, int r, int val) {update(1, 0, MAXN - 1, l, r, val);} //inclusive range
+	void update(int l, int r, int val) {update(1, 0, N - 1, l, r, val);} //inclusive range
 	
-	int query(int l, int r) {return query(1, 0, MAXN - 1, l, r);} //inclusive range
+	int query(int l, int r) {return query(1, 0, N - 1, l, r);} //inclusive range
 	
 	void init(int i, int lo, int hi) {
 		//if default segtree values are not zero, initialize node i
