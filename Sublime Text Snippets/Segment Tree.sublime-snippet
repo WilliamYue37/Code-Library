@@ -5,6 +5,8 @@ public:
 	int N;
 	vector<int> minimum, delta;
 
+	SegmentTree() {}
+
 	SegmentTree(int N) {
 		this->N = N;
 		minimum = vector<int>(N);
