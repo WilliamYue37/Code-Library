@@ -2,7 +2,13 @@
 	<content><![CDATA[
 class BIT {
 public:
-	int BIT[${1:size}];
+	int N;
+	vector<int> BIT;
+
+	BIT(int N) {
+		this->N;
+		BIT = vector<int>(N);
+	}
 
 	int query(int index) {
 		++index; int sum = 0;
@@ -15,7 +21,7 @@ public:
 
 	void update(int index, int val) {
 		++index;
-		while (index <= ${1:size}) {
+		while (index <= N) {
 			BIT[index] += val;
 			index += index & -index;
 		}
