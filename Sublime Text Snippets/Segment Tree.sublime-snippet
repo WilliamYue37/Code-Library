@@ -9,8 +9,8 @@ public:
 
 	SegmentTree(int N) {
 		this->N = N;
-		minimum = vector<int>(N);
-		delta = vector<int>(N);
+		minimum = vector<int>(4 * N + 1);
+		delta = vector<int>(4 * N + 1);
 		//you don't need to init unless default values are not zero
 		//init(1, 0, N - 1);
 	}
