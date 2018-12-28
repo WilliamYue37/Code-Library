@@ -2,10 +2,7 @@
 	<content><![CDATA[
 struct Edge {
 	int u, v, w;
-
-	bool operator < (const Edge &e) const {
-		return this->w < e.w;
-	}
+	bool operator < (const Edge &e) const {return this->w < e.w;}
 };
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
