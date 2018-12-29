@@ -1,22 +1,22 @@
 <snippet>
 	<content><![CDATA[
-int dist[MAXN];
-int dijkstra() {
+vector<int> dijkstra(int start) {
+	vector<int> dist(N + 1, (1 << 29));
 	priority_queue<pair<int, int>> pq;
-	fill(dist, dist + MAXN, (1 << 29));
-	pq.push(pair<int, int>(0, 1)); //dist, u
-	dist[1] = 0;
+	pq.push({start, 0}); //u, dist
+	dist[start] = 0;
 	while (!pq.empty()) {
-		int u = pq.top().second, d = pq.top().first; pq.pop();
+		int u = pq.top().first, d = pq.top().second; pq.pop();
 		if (d > dist[u]) continue;
-		for (int v : adjList[u]) {
-			if (dist[u] + adjMatrix[u][v] < dist[v]) {
-				pq.push(pair<int, int>(dist[u] + adjMatrix[u][v], v));
-				dist[v] = dist[u] + adjMatrix[u][v];
+		for (auto edge : adjList[u]) {
+			int v = edge.first, w = edge.second;
+			if (dist[u] + w < dist[v]) {
+				pq.push({v, dist[u] + w});
+				dist[v] = dist[u] + w;
 			}
 		}
 	}
-	return dist[N];
+	return dist;
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
