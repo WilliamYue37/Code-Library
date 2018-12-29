@@ -2,7 +2,7 @@
 	<content><![CDATA[
 vector<int> dijkstra(int start) {
 	vector<int> dist(N + 1, (1 << 29));
-	priority_queue<pair<int, int>> pq;
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 	pq.push({start, 0}); //u, dist
 	dist[start] = 0;
 	while (!pq.empty()) {
