@@ -2,10 +2,10 @@
 	<content><![CDATA[
 bool check(vector<int> degree) {
 	sort(degree.begin(), degree.end(), greater<int>());
-	long long left = 0, right = 0;
+	long long left = 0, right = 0; for (int k = 0; k < N; ++k) right += min(k + 1, degree[k]);
 	for (int k = 0; k < N; ++k) {
 		left += degree[k];
-		right -= min(degree[k], k);
+		right -= min(degree[k], k + 1);
 		if (left > (long long)(k + 1) * k + right) return false;
 	}
 	return true;
