@@ -3,17 +3,17 @@
 class BIT {
 public:
 	int N;
-	vector<int> BIT;
+	vector<int> bit;
 
 	BIT(int N) {
-		this->N;
-		BIT = vector<int>(N);
+		this->N = N;
+		bit = vector<int>(N + 1);
 	}
 
 	int query(int index) {
 		++index; int sum = 0;
 		while (index > 0) {
-			sum += BIT[index];
+			sum += bit[index];
 			index -= index & -index;
 		}
 		return sum;
@@ -22,7 +22,7 @@ public:
 	void update(int index, int val) {
 		++index;
 		while (index <= N) {
-			BIT[index] += val;
+			bit[index] += val;
 			index += index & -index;
 		}
 	}

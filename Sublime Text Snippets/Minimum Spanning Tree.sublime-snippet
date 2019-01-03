@@ -1,15 +1,15 @@
 <snippet>
 	<content><![CDATA[
-	//make sure to sort edges and to initialize parent array
-	int components = N, cost = 0;
-	for (int i = 0; i < edges.size() && components > 1; ++i) {
-		int u = edges[i].u, v = edges[i].v, w = edges[i].w;
-		if (find(u) != find(v)) {
-			unionSet(u, v);
-			cost += w;
-			--components;
-		}
+//make sure to sort edges and to initialize parent array
+int components = N, cost = 0;
+for (int i = 0; i < edges.size() && components > 1; ++i) {
+	int u = edges[i].u, v = edges[i].v, w = edges[i].w;
+	if (find(u) != find(v)) {
+		unionSet(u, v);
+		cost += w;
+		--components;
 	}
+}
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>mst</tabTrigger>
