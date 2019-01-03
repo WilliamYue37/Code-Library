@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-bool check(vector<int> degree) {
+bool check(vector<int> &degree) {
 	sort(degree.begin(), degree.end(), greater<int>());
 	long long left = 0, right = 0; for (int k = 0; k < N; ++k) right += min(k + 1, degree[k]);
 	for (int k = 0; k < N; ++k) {
