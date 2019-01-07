@@ -2,8 +2,12 @@
 	<content><![CDATA[
 bool check(vector<int> &degree) {
     sort(degree.begin(), degree.end(), greater<int>());
-    vector<int> freq(MAXN + 1); //MAXNUM is the largest degree value
-    for (int i = 0; i < degree.size(); ++i) ++freq[degree[i]];
+    vector<int> freq(MAXNUM + 1); //MAXNUM is the largest degree value
+    ll sum = 0;
+    for (int i = 0; i < degree.size(); ++i) {
+		++freq[degree[i]];
+		sum += degree[i];
+    }
     long long left = 0, right = 0; int less = 0;
     for (int k = 1, i = 0; k <= degree.size() && i < degree.size(); ++k, ++i) {
         left += degree[i];
@@ -12,12 +16,10 @@ bool check(vector<int> &degree) {
         if (degree[i] < k - 1) --less;
         less += freq[k - 1];
         right += degree.size() - k - less;
-        cout << "k: " << k << " right: " << right << '\n';
         if (left > (long long)k * (k - 1) + right) return false;
     }
     return true;
 }
-
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>erdosGallai</tabTrigger>
