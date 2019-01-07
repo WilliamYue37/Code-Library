@@ -3,7 +3,7 @@
 bool check(vector<int> &degree) {
     sort(degree.begin(), degree.end(), greater<int>());
     vector<int> freq(MAXNUM + 1); //MAXNUM is the largest degree value
-    ll sum = 0;
+    long long sum = 0;
     for (int i = 0; i < degree.size(); ++i) {
 		++freq[degree[i]];
 		sum += degree[i];
