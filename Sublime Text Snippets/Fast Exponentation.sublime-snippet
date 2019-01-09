@@ -1,17 +1,17 @@
 <snippet>
 	<content><![CDATA[
-ll modExpo(int base, int e) {
+ll fastExpo(int base, int e) {
     if (e == 0) return 1;
     if (e == 1) return base;
-    ll ans = modExpo(base, e / 2);
+    ll ans = fastExpo(base, e / 2);
     ans = ans * ans % MOD;
     if (e % 2 == 1) ans = ans * base % MOD;
-    return (int)ans;
+    return ans;
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>modExpo</tabTrigger>
+	<tabTrigger>fastExpo</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<description>Modular Exponentation</description> 
+	<description>Fast Exponentation</description> 
 </snippet>
