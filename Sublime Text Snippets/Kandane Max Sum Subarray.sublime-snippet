@@ -1,0 +1,17 @@
+<snippet>
+	<content><![CDATA[
+int kadane(vector<int> &a) {
+	int maxEndingHere = 0, maxSoFar = 0;
+	for (int i = 0; i < a.size(); ++i) {
+		maxEndingHere = max(maxEndingHere, maxEndingHere + a[i]);
+		maxSoFar = max(maxSoFar, maxEndingHere);
+	}
+	return maxSoFar;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>kadane</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Kandane Max Sum Subarray</description>
+</snippet>
