@@ -14,8 +14,7 @@ const int MOD = 1000000007;
 const ll INF = 1000000000000000000LL;
 
 int main() {
-	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin);
-	freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
+	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin); freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
 	ios_base::sync_with_stdio(0); cin.tie(0);
 	
 	$0
