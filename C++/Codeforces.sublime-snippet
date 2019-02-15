@@ -8,10 +8,12 @@ using namespace std;
 #define ss second
 
 typedef long long ll;
+typedef long double ld;
 typedef pair<int, int> pi;
 
 const int MOD = 1000000007;
 const ll INF = 1000000000000000000LL;
+const ld PI = 4 * atan((ld)1);
 
 int main() {
 	ios_base::sync_with_stdio(0); cin.tie(0);
