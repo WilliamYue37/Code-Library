@@ -5,6 +5,11 @@ struct Node {
     Node *l, *r;
     int sz; long long sum; //range queries
     bool flip; //lazy update
+
+    Node(int key) {
+        this->key = key; priority = rand() + (rand() << 15); l = r = NULL;
+        sz = 1; sum = key; flip = false;
+    }
 };
 
 int getSize(Node* t) {return t != NULL ? t->sz : 0;}
@@ -66,12 +71,17 @@ Node* merge(Node* left, Node* right) {
 
 Node* insert(Node* t, int key) {
     auto a = split(t, key), b = split(a.second, key + 1);
-    return merge(a.first, merge(new Node{key}, b.second));
+    return merge(a.first, merge(new Node(key), b.second));
 }
 
 Node* del(Node* t, int key) {
     auto a = split(t, key), b = split(a.second, key + 1);
     return merge(a.first, b.second);
+}
+
+bool contains(Node* t, int key) {
+    if (t == NULL) return false; if (t->key == key) return true;
+    return contains(t->l, key) || contains(t->r, key);
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
