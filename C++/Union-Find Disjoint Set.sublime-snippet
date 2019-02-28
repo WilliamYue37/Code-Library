@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-int ranks[MAXN], parent[MAXN];
+int ranks[MAX_N], parent[MAX_N];
 
 int find(int a) {
 	return parent[a] == a ? a : (parent[a] = find(parent[a]));
