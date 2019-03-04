@@ -13,7 +13,6 @@ typedef pair<int, int> pi;
 
 const int MOD = 1000000007;
 const ll INF = 1000000000000000000LL;
-const ld PI = 4 * atan((ld)1);
 
 int main() {
 	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin); freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
