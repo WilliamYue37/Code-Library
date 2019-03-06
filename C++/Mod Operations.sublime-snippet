@@ -1,0 +1,15 @@
+<snippet>
+	<content><![CDATA[
+namespace modOp {
+    int ad(int a, int b, int mod = MOD) { return (a + b) % mod; }
+    int sub(int a, int b, int mod = MOD) { return (a - b + mod) % mod; }
+    int mul(int a, int b, int mod = MOD) { return (ll)a * b % mod; }
+}
+using namespace modOP;
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>modOperations</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Mod Operations</description>
+</snippet>
