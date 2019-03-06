@@ -5,7 +5,7 @@ namespace modOp {
     int sub(int a, int b, int mod = MOD) { return (a - b + mod) % mod; }
     int mul(int a, int b, int mod = MOD) { return (ll)a * b % mod; }
 }
-using namespace modOP;
+using namespace modOp;
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>modOperations</tabTrigger>
