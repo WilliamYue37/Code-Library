@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 namespace modOp {
-    int ad(int a, int b, int mod = MOD) { return (a + b) % mod; }
+    int add(int a, int b, int mod = MOD) { return (a + b) % mod; }
     int sub(int a, int b, int mod = MOD) { return (a - b + mod) % mod; }
     int mul(int a, int b, int mod = MOD) { return (ll)a * b % mod; }
 }
