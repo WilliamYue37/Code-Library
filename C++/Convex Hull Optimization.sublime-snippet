@@ -9,6 +9,7 @@ struct Sol {
         return (ll)slope * (x2 - x) + prevSol;
     }
 
+    //time Sol r overtakes this 
     ll to(Sol r) const {
         ll lo = max(this->x, r.x);
         ll hi = lo;
