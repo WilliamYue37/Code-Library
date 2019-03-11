@@ -1,0 +1,95 @@
+<snippet>
+	<content><![CDATA[
+struct Sol {
+    int x;
+    int slope;
+    ll prevSol;
+
+    ll compute(int x2) const {
+        return (ll)slope * (x2 - x) + prevSol;
+    }
+
+    ll to(Sol r) const {
+        ll lo = max(this->x, r.x);
+        ll hi = lo;
+        while (compute(hi) >= r.compute(hi)) {
+            lo = hi;
+            hi *= 2;
+        }
+        while (lo < hi) {
+            int m = (lo + hi) / 2;
+            if (compute(m) >= r.compute(m)) lo = m + 1;
+            else hi = m;
+        }
+        return hi;
+    }
+
+    bool operator<(const Sol& other) const {
+        return this->slope < other.slope;
+    }
+};
+
+class CHT {
+public:
+    multiset<Sol> hull;
+
+    void insert(Sol part) {
+        multiset<Sol>::iterator same = hull.lower_bound(part);
+        if (same != hull.end() && same->slope == part.slope) {
+            if (same->compute(part.x) >= part.compute(part.x)) return;
+            hull.erase(same);
+        }
+
+        multiset<Sol>::iterator above = hull.upper_bound(part);
+        multiset<Sol>::iterator below = hull.lower_bound(part);
+        if (above != hull.end() && below != hull.begin() && (--below)->to(part) >= part.to(*above)) return;
+
+        while (true) {
+            multiset<Sol>::iterator up1 = hull.upper_bound(part);
+            if (up1 == hull.end()) break;
+            multiset<Sol>::iterator up2 = hull.upper_bound(*up1);
+            if (up2 == hull.end()) break;
+
+            ll t1 = part.to(*up1);
+            ll t2 = up1->to(*up2);
+
+            if (t1 < t2) break;
+
+            hull.erase(up1);
+        }
+
+        while (true) {
+            multiset<Sol>::iterator lo1 = hull.lower_bound(part);
+            if (lo1 == hull.begin()) break; --lo1;
+            multiset<Sol>::iterator lo2 = hull.lower_bound(*lo1);
+            if (lo2 == hull.begin()) break; --lo2;
+
+            ll t1 = lo2->to(*lo1);
+            ll t2 = lo1->to(part);
+
+            if (t1 < t2) break;
+
+            hull.erase(lo1);
+        }
+
+        hull.insert(part);
+    }
+
+    ll query(int x) {
+        while (hull.size() >= 2) {
+            Sol f = *hull.begin();
+            Sol s = *hull.upper_bound(f);
+            if (f.compute(x) > s.compute(x)) break;
+            hull.erase(hull.begin());
+        }
+        if (hull.size() > 0) return hull.begin()->compute(x);
+        else return -1;
+    }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>cht</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<desciption>Convex Hull Optimization</desciption>
+</snippet>
