@@ -9,8 +9,7 @@ struct Sol {
         return (ll)slope * (x2 - x) + prevSol;
     }
 
-    //time Sol r overtakes this 
-    ll to(Sol r) const {
+    ll intersect(Sol r) const {
         ll lo = max(this->x, r.x);
         ll hi = lo;
         while (compute(hi) >= r.compute(hi)) {
@@ -35,24 +34,24 @@ public:
     multiset<Sol> hull;
 
     void insert(Sol part) {
-        multiset<Sol>::iterator same = hull.lower_bound(part);
+        auto same = hull.lower_bound(part);
         if (same != hull.end() && same->slope == part.slope) {
             if (same->compute(part.x) >= part.compute(part.x)) return;
             hull.erase(same);
         }
 
-        multiset<Sol>::iterator above = hull.upper_bound(part);
-        multiset<Sol>::iterator below = hull.lower_bound(part);
-        if (above != hull.end() && below != hull.begin() && (--below)->to(part) >= part.to(*above)) return;
+        auto above = hull.upper_bound(part);
+        auto below = hull.lower_bound(part);
+        if (above != hull.end() && below != hull.begin() && (--below)->intersect(part) >= part.intersect(*above)) return;
 
         while (true) {
-            multiset<Sol>::iterator up1 = hull.upper_bound(part);
+            auto up1 = hull.upper_bound(part);
             if (up1 == hull.end()) break;
-            multiset<Sol>::iterator up2 = hull.upper_bound(*up1);
+            auto up2 = hull.upper_bound(*up1);
             if (up2 == hull.end()) break;
 
-            ll t1 = part.to(*up1);
-            ll t2 = up1->to(*up2);
+            ll t1 = part.intersect(*up1);
+            ll t2 = up1->intersect(*up2);
 
             if (t1 < t2) break;
 
@@ -60,13 +59,13 @@ public:
         }
 
         while (true) {
-            multiset<Sol>::iterator lo1 = hull.lower_bound(part);
+            auto lo1 = hull.lower_bound(part);
             if (lo1 == hull.begin()) break; --lo1;
-            multiset<Sol>::iterator lo2 = hull.lower_bound(*lo1);
+            auto lo2 = hull.lower_bound(*lo1);
             if (lo2 == hull.begin()) break; --lo2;
 
-            ll t1 = lo2->to(*lo1);
-            ll t2 = lo1->to(part);
+            ll t1 = lo2->intersect(*lo1);
+            ll t2 = lo1->intersect(part);
 
             if (t1 < t2) break;
 
