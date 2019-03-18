@@ -1,27 +1,15 @@
 <snippet>
 	<content><![CDATA[
 struct Sol {
-    int x;
     int slope;
     ll prevSol;
 
-    ll compute(int x2) const {
-        return (ll)slope * (x2 - x) + prevSol;
+    ll compute(int x) const {
+        return (ll)slope * x + prevSol;
     }
 
     ll intersect(Sol r) const {
-        ll lo = max(this->x, r.x);
-        ll hi = lo;
-        while (compute(hi) >= r.compute(hi)) {
-            lo = hi;
-            hi *= 2;
-        }
-        while (lo < hi) {
-            int m = (lo + hi) / 2;
-            if (compute(m) >= r.compute(m)) lo = m + 1;
-            else hi = m;
-        }
-        return hi;
+        return ceil((ld)(this->prevSol - r.prevSol)/(r.slope - this->slope));
     }
 
     bool operator<(const Sol& other) const {
