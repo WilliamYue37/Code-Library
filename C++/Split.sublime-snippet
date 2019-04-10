@@ -1,0 +1,19 @@
+<snippet>
+	<content><![CDATA[
+vector<string> split(string s, string delimiter) {
+	vector<string> ret;
+	long long pos = 0;
+	while ((pos = s.find(delimiter)) != string::npos) {
+		ret.push_back(s.substr(0, pos));
+		s.erase(0, pos + delimiter.length());
+	}
+	ret.push_back(s);
+	return ret;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>split</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Splits a string using a delimiter</description>
+</snippet>
