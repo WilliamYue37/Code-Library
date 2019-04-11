@@ -2,12 +2,15 @@
 	<content><![CDATA[
 vector<string> split(string s, string delimiter) {
 	vector<string> ret;
-	long long pos = 0;
-	while ((pos = s.find(delimiter)) != string::npos) {
-		ret.push_back(s.substr(0, pos));
-		s.erase(0, pos + delimiter.length());
-	}
-	ret.push_back(s);
+	auto start = 0U;
+	auto end = s.find(delimiter);
+    while (end != string::npos)
+    {
+        ret.push_back(s.substr(start, end - start));
+        start = end + delimiter.length();
+        end = s.find(delimiter, start);
+    }
+    ret.push_back(s.substr(start, end));
 	return ret;
 }
 ]]></content>
