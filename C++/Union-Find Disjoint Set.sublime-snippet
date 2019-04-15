@@ -5,6 +5,8 @@ public:
 	int numOfComponents;
 	vector<int> parent, rank, size;
 
+	DSU() {}
+
 	DSU(int n) {
 		parent.resize(n); rank.resize(n); size.resize(n);
 		numOfComponents = n;
