@@ -1,17 +1,38 @@
 <snippet>
 	<content><![CDATA[
-int ranks[MAX_N], parent[MAX_N];
+class DSU {
+public:
+	int numOfComponents;
+	vector<int> parent, rank, size;
 
-int find(int a) {
-	return parent[a] == a ? a : (parent[a] = find(parent[a]));
-}
+	DSU(int n) {
+		parent.resize(n); rank.resize(n); size.resize(n);
+		numOfComponents = n;
+		for (int i = 0; i < n; ++i) {
+			parent[i] = i;
+			rank[i] = 0;
+			size[i] = 1;
+		}
+	}
 
-void unionSet(int a, int b) {
-	a = find(a); b = find(b);
-	if (ranks[a] > ranks[b]) parent[b] = parent[a];
-	else parent[a] = parent[b];
-	if (ranks[a] == ranks[b]) ++ranks[b];
-}
+	int find(int a) {
+		return parent[a] == a ? a : (parent[a] = find(parent[a]));
+	}
+
+	void unionSet(int a, int b) {
+		a = find(a); b = find(b);
+		if (rank[a] > rank[b]) {
+			parent[b] = parent[a];
+			size[a] += size[b];
+		}
+		else {
+			parent[a] = parent[b];
+			size[b] += size[a];
+		}
+		if (rank[a] == rank[b]) ++rank[b];
+		--numOfComponents;
+	}
+};
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
 	<tabTrigger>dsu</tabTrigger>
