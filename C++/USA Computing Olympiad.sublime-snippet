@@ -11,8 +11,9 @@ typedef long long ll;
 typedef long double ld;
 typedef pair<int, int> pi;
 
-const int MOD = 1000000007;
-const ll INF = 1000000000000000000LL;
+const int MOD = 1e9 + 7;
+const ll INF = 1e18;
+const double EPS = 1e-6;
 
 int main() {
 	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin); freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
