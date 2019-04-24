@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-int A[MAXN], L[MAXN], L_id[MAXN], prev_id[MAXN]; //negate values in array A for longest decreasing subsequence
+int A[MAX_N], L[MAX_N], L_id[MAX_N], prev_id[MAX_N]; //negate values in array A for longest decreasing subsequence
 stack<int> stk;
 
 int LIS() {
