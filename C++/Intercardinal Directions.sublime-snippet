@@ -1,10 +1,10 @@
 <snippet>
 	<content><![CDATA[
-int dr[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-int dc[] = {0, 1, 1, 1, 0, -1, -1, -1};
+int dr[] = {-1, 0, 1, 0, -1, 1, 1, -1};
+int dc[] = {0, 1, 0, -1, 1, 1, -1, -1};
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>drdc2</tabTrigger>
+	<tabTrigger>drdc</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
 	<description>Intercardinal Directions</description>
