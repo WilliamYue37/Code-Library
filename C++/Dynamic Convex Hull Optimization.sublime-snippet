@@ -76,8 +76,8 @@ public:
 };
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>cht</tabTrigger>
+	<tabTrigger>cht dynamic</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<desciption>Convex Hull Optimization</desciption>
+	<desciption>Dynamic Convex Hull Optimization</desciption>
 </snippet>
