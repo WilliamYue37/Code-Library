@@ -1,0 +1,49 @@
+<snippet>
+	<content><![CDATA[
+struct Sol {
+	ll x;
+	ll prevCost;
+
+	ll compute(ll y) {
+		ll d = x - y;
+		return d * d + prevCost;
+	}
+
+	//time that r overtakes this
+	ll intersect(Sol r) {
+		ll lo = r.x, hi = r.x;
+		while (compute(hi) < r.compute(hi)) {
+			lo = hi + 1;
+			hi *= 2;
+		}
+		while (lo < hi) {
+			ll m = (lo + hi) / 2;
+			if (compute(m) >= r.compute(m)) hi = m;
+			else lo = m + 1;
+		}
+		return hi;
+	}
+};
+
+class CHT {
+public: 
+	Sol dq[MAX_N]; //deque
+	int p1, p2; //front and back pointers, respectively 
+
+	void insert(Sol part) {
+		while (p2 - p1 >= 2 && dq[p2 - 2].intersect(dq[p2 - 1]) >= dq[p2 - 2].intersect(part)) --p2;
+		dq[p2++] = part;
+	}
+
+	ll query(int x) {
+		while (p1 + 1 < p2 && dq[p1].compute(x) >= dq[p1 + 1].compute(x)) ++p1;
+		return dq[p1].compute(x);
+	}
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>cht</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Static Convex Hull Optimization</description>
+</snippet>
