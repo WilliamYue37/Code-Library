@@ -1,7 +1,6 @@
 <snippet>
 	<content><![CDATA[
-class SegmentTree {
-public:
+struct SegmentTree {
 	int N;
 	vector<int> minimum, delta;
 
@@ -9,8 +8,8 @@ public:
 
 	SegmentTree(int N) {
 		this->N = N;
-		minimum = vector<int>(4 * N + 1);
-		delta = vector<int>(4 * N + 1);
+		minimum.resize(4 * N + 1);
+		delta.resize(4 * N + 1);
 		//you don't need to init unless default values are not zero
 		//init(1, 0, N - 1);
 	}

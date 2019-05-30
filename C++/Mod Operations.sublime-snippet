@@ -1,17 +1,18 @@
 <snippet>
 	<content><![CDATA[
 ll fastExpo(int base, int e) {
-    if (e == 0) return 1;
-    if (e == 1) return base;
-    ll ans = fastExpo(base, e / 2);
-    ans = ans * ans % MOD;
-    if (e % 2 == 1) ans = ans * base % MOD;
+    ll ans = 1;
+    while(e != 0) {
+        if(e % 2 == 1) ans = (ll) ans * base % MOD;
+        base = (ll) base * base % MOD;
+        e /= 2;
+    }
     return ans;
 }
 
 namespace modOp {
-    int add(int a, int b, int mod = MOD) {return (a + b) % mod;}
-    int sub(int a, int b, int mod = MOD) {return (a - b + mod) % mod;}
+    int add(int a, int b, int mod = MOD) {return (a + b) % mod; /*int r = a + b; if (r >= mod) r -= mod; return r;*/} 
+    int sub(int a, int b, int mod = MOD) {return (a - b + mod) % mod; /*int r = a - b; if (r < 0) r += mod; return r;*/}
     int mul(int a, int b, int mod = MOD) {return (ll)a * b % mod;}
     int divide(int a, int b, int mod = MOD) {return (ll)a * fastExpo(b, mod - 2) % mod;} //mod has to be a prime number
 }
