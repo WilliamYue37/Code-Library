@@ -7,7 +7,7 @@ const int NIL = 0; //NOT in list
 //adjList stores the adjacents of the left side vertex u, u ranges from 1 - L, 0 (NIL) is used as a dummy vertex
 //nodes have to be 1-indexed, nodes in L have to be labeled 1 - L, nodes in R have to be labeled 1 - R
 int L, R;
-vector<int> pairL, pairR, dist, adjList[MAX_N];
+vector<int> pairL, pairR, dist, adjList[MAX_L];
 bool BFS() { //returns true if there is an augmenting path, else returns false
 	queue<int> q;
 	for (int u = 1; u <= L; ++u) {
@@ -61,7 +61,7 @@ int hopcroftKarp() { //returns the size of maximum matching
 	dist.resize(L + 1);
 
 	int res = 0;
-	while (BFS()) {
+	while (BFS()) { //continue updating matching while there still is an augmenting path
 		for (int u = 1; u <= L; ++u) {
 			if (pairL[u] == NIL && DFS(u)) ++res;
 		}
