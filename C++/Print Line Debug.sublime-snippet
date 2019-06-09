@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 //START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG START DEBUG
-cout << "debug: " << $0 << "\n";
+cout << "debug: " << $0 << endl;
 //END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG END DEBUG
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
