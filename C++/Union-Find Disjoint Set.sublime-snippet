@@ -1,7 +1,6 @@
 <snippet>
 	<content><![CDATA[
-class DSU {
-public:
+struct DSU {
 	int numOfComponents;
 	vector<int> parent, rank, size;
 
