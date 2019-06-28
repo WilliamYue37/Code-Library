@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-int sparse[MAXN][MAXLOG];
+int sparse[MAX_N][MAX_LOG];
 
 void init() {
 	for (int i = 0; i < N; ++i) sparse[i][0] = arr[i];
