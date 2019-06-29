@@ -1,59 +1,59 @@
 <snippet>
 	<content><![CDATA[
 struct SegmentTree {
-  int N;
-  vector<int> minimum, delta;
+    int N;
+    vector<int> minimum, delta;
 
-  SegmentTree() {}
-  SegmentTree(int N) {
-    this->N = 1;
-    while (this->N < N) this->N <<= 1;
-    minimum.resize(2 * this->N + 1);
-    delta.resize(2 * this->N + 1);
-    //you don't need to init unless default values are not zero
-    //init(1, 0, N - 1);
-  }
-
-  void update(int l, int r, int val) {rec(1, 0, N - 1, l, r, val, 0);} //inclusive range
-
-  int query(int l, int r) {return rec(1, 0, N - 1, l, r, 0, 1);} //inclusive range
-
-  void init(int i, int lo, int hi) {
-    //if default segtree values are not zero, initialize node i
-    if (lo == hi) return;
-      
-    int m = (lo + hi) / 2;
-    init(2 * i, lo, m);
-    init(2 * i + 1, m + 1, hi);
-  }
-
-  void push(int i) {
-    delta[2 * i] += delta[i];
-    delta[2 * i + 1] += delta[i];
-    delta[i] = 0;
-  }
-
-  void pull(int i) {
-    minimum[i] = min(minimum[2 * i] + delta[2 * i], minimum[2 * i + 1] + delta[2 * i + 1]);
-  }
-
-  int rec(int i, int lo, int hi, int l, int r, int val, int type) {
-    if (r < lo || hi < l) return (1 << 29);
-    if (l <= lo && hi <= r) {
-      if (type == 0) delta[i] += val;
-      return minimum[i] + delta[i];
+    SegmentTree() {}
+    SegmentTree(int N) {
+        this->N = 1;
+        while (this->N < N) this->N <<= 1;
+        minimum.resize(2 * this->N + 1);
+        delta.resize(2 * this->N + 1);
+        //you don't need to init unless default values are not zero
+        //init(1, 0, N - 1);
     }
 
-    push(i);
+    void update(int l, int r, int val) {rec(1, 0, N - 1, l, r, val, 0);} //inclusive range
 
-    int m = (lo + hi) / 2;
-    int minLeft = rec(2 * i, lo, m, l, r, val, type);
-    int minRight = rec(2 * i + 1, m + 1, hi, l, r, val, type);
+    int query(int l, int r) {return rec(1, 0, N - 1, l, r, 0, 1);} //inclusive range
 
-    pull(i);
+    void init(int i, int lo, int hi) {
+        //if default segtree values are not zero, initialize node i
+        if (lo == hi) return;
+          
+        int m = (lo + hi) / 2;
+        init(2 * i, lo, m);
+        init(2 * i + 1, m + 1, hi);
+    }
 
-    return min(minLeft, minRight);
-  }
+    void push(int i) {
+        delta[2 * i] += delta[i];
+        delta[2 * i + 1] += delta[i];
+        delta[i] = 0;
+    }
+
+    void pull(int i) {
+        minimum[i] = min(minimum[2 * i] + delta[2 * i], minimum[2 * i + 1] + delta[2 * i + 1]);
+    }
+
+    int rec(int i, int lo, int hi, int l, int r, int val, int type) {
+        if (r < lo || hi < l) return (1 << 29);
+        if (l <= lo && hi <= r) {
+            if (type == 0) delta[i] += val;
+            return minimum[i] + delta[i];
+        }
+
+        push(i);
+
+        int m = (lo + hi) / 2;
+        int minLeft = rec(2 * i, lo, m, l, r, val, type);
+        int minRight = rec(2 * i + 1, m + 1, hi, l, r, val, type);
+
+        pull(i);
+
+        return min(minLeft, minRight);
+    }
 };
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
