@@ -1,8 +1,8 @@
 <snippet>
 	<content><![CDATA[
 int N, source, sink;
-int adjMat[MAXN];
-bool seen[MAXN];
+int adjMat[MAX_N][MAX_N];
+bool seen[MAX_N];
 
 int dfs(int u, int amount) {
 	if (u == sink) return amount;
