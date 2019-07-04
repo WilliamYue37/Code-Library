@@ -1,0 +1,13 @@
+<snippet>
+	<content><![CDATA[
+for (int subset = mask; ; subset = (subset - 1) & mask) {
+	//ans.push_back(subset)
+	if (subset == 0) break;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>subset</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Loops only through bitmask subsets of "mask"</description>
+</snippet>
