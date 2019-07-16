@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
-int parent[MAXN], subtreeSize[MAXN];
-bool blocked[MAXN];
+int parent[MAX_N], subtreeSize[MAX_N];
+bool blocked[MAX_N];
 queue<int> q;
 
 void calcSize(int i, int p) {
@@ -61,5 +61,5 @@ ll go(int entryPoint) {
 	<tabTrigger>centroidDecomposition</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<description>Centriod Decomposition</description>
+	<description>Centroid Decomposition</description>
 </snippet>
