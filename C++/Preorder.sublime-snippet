@@ -1,0 +1,18 @@
+<snippet>
+	<content><![CDATA[
+pi range[MAX_N];
+int id = 0;
+void preorder(int u, int p) {
+	range[u].ff = id++;
+	for (int v: adjList[u]) {
+		if (v != p) preorder(v, u);
+	}
+	range[u].ss = id - 1;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>preorder</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Preorder</description>
+</snippet>
