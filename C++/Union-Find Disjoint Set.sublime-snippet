@@ -7,9 +7,9 @@ struct DSU {
 	DSU() {}
 
 	DSU(int n) {
-		parent.resize(n); rank.resize(n); size.resize(n);
+		parent.resize(n + 1); rank.resize(n + 1); size.resize(n + 1);
 		numOfComponents = n;
-		for (int i = 0; i < n; ++i) {
+		for (int i = 1; i <= n; ++i) {
 			parent[i] = i;
 			rank[i] = 0;
 			size[i] = 1;
