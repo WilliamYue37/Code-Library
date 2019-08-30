@@ -1,12 +1,10 @@
 <snippet>
 	<content><![CDATA[
-int gcd(int a, int b) {
-	return (b == 0 ? a : gcd(b, a % b));
-}
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>gcd</tabTrigger>
+	<tabTrigger>rng</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<description>Greatest Common Factor</description>
+	<description>Random Number Generator</description>
 </snippet>
