@@ -1,4 +1,3 @@
 # Code Templates
-Code templates for use in programming competitions and projects!  
-Disclaimer: Not all the code is mine; It's just what I use for competitions.
+Code Library for use in programming competitions!  
 If you find any issues or if you have any suggestions please email williamyue37@gmail.com.
