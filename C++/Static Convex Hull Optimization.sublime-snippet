@@ -35,7 +35,7 @@ public:
 		dq[p2++] = part;
 	}
 
-	ll query(int x) {
+	ll query(ll x) {
 		while (p1 + 1 < p2 && dq[p1].compute(x) >= dq[p1 + 1].compute(x)) ++p1;
 		return dq[p1].compute(x);
 	}
