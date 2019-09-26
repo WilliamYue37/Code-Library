@@ -1,44 +1,46 @@
 <snippet>
 	<content><![CDATA[
 struct Sol {
-	ll x;
-	ll prevCost;
+	ll m;
+	ll b;
 
-	ll compute(ll y) {
-		ll d = x - y;
-		return d * d + prevCost;
+	ll compute(ll x) {
+		return m * x + b;
 	}
 
-	//time that r overtakes this
 	ll intersect(Sol r) {
-		ll lo = r.x, hi = r.x;
-		while (compute(hi) < r.compute(hi)) {
-			lo = hi + 1;
-			hi *= 2;
-		}
-		while (lo < hi) {
-			ll m = (lo + hi) / 2;
-			if (compute(m) >= r.compute(m)) hi = m;
-			else lo = m + 1;
-		}
-		return hi;
+		return (ld)(this->b - r.b)/(r.m - this->m);
 	}
 };
 
 class CHT {
 public: 
-	Sol dq[MAX_N]; //deque
+	Sol hull[MAX_N]; //deque
 	int p1, p2; //front and back pointers, respectively 
 
 	void insert(Sol part) {
-		while (p2 - p1 >= 2 && dq[p2 - 2].intersect(dq[p2 - 1]) >= dq[p2 - 2].intersect(part)) --p2;
-		dq[p2++] = part;
+		while (p2 - p1 >= 2 && hull[p2 - 2].intersect(hull[p2 - 1]) >= hull[p2 - 2].intersect(part)) --p2;
+		hull[p2++] = part;
 	}
 
+	//static queries
 	ll query(ll x) {
-		while (p1 + 1 < p2 && dq[p1].compute(x) >= dq[p1 + 1].compute(x)) ++p1;
-		return dq[p1].compute(x);
+		while (p1 + 1 < p2 && hull[p1].compute(x) >= hull[p1 + 1].compute(x)) ++p1;
+		return hull[p1].compute(x);
 	}
+
+	//dynamic queries
+	/*ll query(ll x) {
+		int lo = p1, hi = p2 - 2;
+		if (p1 + 1 == p2) return hull[p1].compute(x);
+		if (x < hull[p2 - 1].intersect(hull[p2 - 2])) return hull[p2 - 1].compute(x);
+		while (hi - lo > 1) {
+			int m = (lo + hi) / 2;
+			if (x >= hull[m].intersect(hull[m + 1])) hi = m;
+			else lo = m;
+		}
+		return hull[hi].compute(x);
+	}*/
 };
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->

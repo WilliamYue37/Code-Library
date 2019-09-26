@@ -1,19 +1,19 @@
 <snippet>
 	<content><![CDATA[
 struct Sol {
-    int slope;
-    ll prevSol;
+    int m;
+    ll b;
 
     ll compute(int x) const {
-        return (ll)slope * x + prevSol;
+        return (ll)m * x + b;
     }
 
-    ll intersect(Sol r) const {
-        return ceil((ld)(this->prevSol - r.prevSol)/(r.slope - this->slope));
+    ld intersect(Sol r) const {
+        return (ld)(this->b - r.b)/(r.m - this->m);
     }
 
     bool operator<(const Sol& other) const {
-        return this->slope < other.slope;
+        return this->m < other.m;
     }
 };
 
@@ -23,7 +23,7 @@ public:
 
     void insert(Sol part) {
         auto same = hull.lower_bound(part);
-        if (same != hull.end() && same->slope == part.slope) {
+        if (same != hull.end() && same->m == part.m) {
             if (same->compute(part.x) >= part.compute(part.x)) return;
             hull.erase(same);
         }
