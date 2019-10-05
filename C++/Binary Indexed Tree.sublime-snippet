@@ -1,7 +1,6 @@
 <snippet>
 	<content><![CDATA[
-class BIT {
-public:
+struct BIT {
 	int N;
 	vector<int> bit;
 
