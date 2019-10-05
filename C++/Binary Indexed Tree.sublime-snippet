@@ -19,12 +19,16 @@ public:
 		return sum;
 	}
 
+	int query(int l, int r) {
+		return query(r) - (l == 0 ? 0 : query(l - 1));
+	}
+
 	void update(int index, int val) {
 		++index;
 		while (index <= N) {
 			bit[index] += val;
 			index += index & -index;
-		}
+		}	
 	}
 };
 ]]></content>
