@@ -5,6 +5,8 @@ public:
 	int N;
 	vector<int> bit;
 
+	BIT() {}
+
 	BIT(int N) {
 		this->N = N;
 		bit = vector<int>(N + 1);
