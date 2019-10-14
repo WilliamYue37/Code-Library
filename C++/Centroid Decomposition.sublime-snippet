@@ -4,14 +4,14 @@ int parent[MAX_N], subtreeSize[MAX_N];
 bool blocked[MAX_N];
 queue<int> q;
 
-void calcSize(int i, int p) {
-	parent[i] = p;
-	subtreeSize[i] = 1;
+void calcSize(int u, int p) {
+	parent[u] = p;
+	subtreeSize[u] = 1;
 
-	for (ii e: adjList[i]) {
-		if (e.first != p && !blocked[e.first]) {
-			calcSize(e.first, i);
-			subtreeSize[i] += subtreeSize[e.first];
+	for (pi e: adjList[u]) {
+		if (e.ff != p && !blocked[e.ff]) {
+			calcSize(e.ff, u);
+			subtreeSize[u] += subtreeSize[e.ff];
 		}
 	}
 }
@@ -32,10 +32,10 @@ ll go(int entryPoint) {
 
 		int size = subtreeSize[entryPoint] - subtreeSize[i];
 
-		for (ii e: adjList[i]) {
-			if (e.first != parent[i] && !blocked[e.first]) {
-				size = max(size, subtreeSize[e.first]);
-				q.push(e.first);
+		for (pi e: adjList[i]) {
+			if (e.ff != parent[i] && !blocked[e.ff]) {
+				size = max(size, subtreeSize[e.ff]);
+				q.push(e.ff);
 			}
 		}
 
@@ -48,9 +48,9 @@ ll go(int entryPoint) {
 	ll ways = solveTree(centroid);
 
 	blocked[centroid] = true;
-	for (ii e: adjList[centroid]) {
-		if (!blocked[e.first]) {
-			ways += go(e.first);
+	for (pi e: adjList[centroid]) {
+		if (!blocked[e.ff]) {
+			ways += go(e.ff);
 		}
 	}
 
