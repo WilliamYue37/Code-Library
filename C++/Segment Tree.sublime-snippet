@@ -11,7 +11,7 @@ struct SegmentTree {
         mini.resize(2 * this->N + 1);
         delta.resize(2 * this->N + 1);
         //you don't need to init unless default values are not zero
-        //init(1, 0, N - 1);
+        //init(1, 0, this->N - 1);
     }
 
     void update(int l, int r, int val) {rec(1, 0, N - 1, l, r, val, 0);} //inclusive range
