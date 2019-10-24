@@ -38,7 +38,7 @@ struct SegmentTree {
     }
 
     int rec(int i, int lo, int hi, int l, int r, int val, int type) {
-        if (r < lo || hi < l) return (1 << 29);
+        if (r < lo || hi < l) return INF;
         if (l <= lo && hi <= r) {
             if (type == 0) delta[i] += val;
             return mini[i] + delta[i];
