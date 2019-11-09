@@ -1,0 +1,80 @@
+<snippet>
+	<content><![CDATA[
+import java.util.*;
+import java.io.*;
+
+public class BFS {
+
+	static class State {
+		int r, c, d; // "d" stores the distance it takes to reach cell (r, c) from the start
+
+		State(int r, int c, int d) {
+			this.r = r;
+			this.c = c;
+			this.d = d;
+		}
+	}
+
+	// directional arrays to help with transitioning from one cell to another - NOTE* this is an advanced trick, it's ok if you don't understand it for now
+	static int[] dr = {-1, 0, 1, 0};
+	static int[] dc = {0, 1, 0, -1};
+
+	public static void main(String[] args) throws Exception {
+		Scanner in = new Scanner(new File("BFS.in"));
+
+		int testCases = in.nextInt();
+		for (int tc = 0; tc < testCases; tc++) { // loop through all the test cases
+			int N = in.nextInt(), M = in.nextInt();
+			char[][] grid = new char[N][M]; // matrix to store the grid
+
+			// input the grid
+			int start_r = 0, start_c = 0, end_r = 0, end_c = 0; // start is fred's starting position, end is fred's ending position
+			for (int r = 0; r < N; r++) {
+				String line = in.next();
+				for (int c = 0; c < M; c++) {
+					grid[r][c] = line.charAt(c);
+					if (grid[r][c] == 'S') { // assign fred's start position 
+						start_r = r;
+						start_c = c;
+					}
+					if (grid[r][c] == 'E') { // assign fred's ending position
+						end_r = r;
+						end_c = c;
+					}
+				}
+			}
+
+			int[][] dist = new int[N][M]; // stores the shortest distance to cell (i, j) - if the cell (i, j) has not been visited before, then dist[i][j] = INF (1 << 29)
+			for (int i = 0; i < N; ++i) for (int j = 0; j < M; ++j) dist[i][j] = (1 << 29); // set the initial distance to all cells as INF
+			Deque<State> queue = new ArrayDeque<State>(); // Deque is a faster way to implement a Java queue
+			queue.add(new State(start_r, start_c, 0)); // the queue starts out with just the starting node
+			dist[start_r][start_c] = 0;
+
+			while (!queue.isEmpty()) { // continue BFS until the queue is empty
+				State cur = queue.poll(); // remove the first State in the queue
+				int r = cur.r, c = cur.c, d = cur.d;
+
+				if (d >= dist[r][c]) continue;
+
+				for (int i = 0; i < 4; ++i) {
+					int new_r = r + dr[i], new_c = c + dc[i], new_d = d + 1; // uses directional arrays to transition from one cell to an adjacent cell (please reference global 'dr' and 'dc' arrays for more info)
+					// check that the adjacent cell is within the boundaries of the grid, not visited previously, and not a wall (#)
+					if (new_r >= 0 && new_r < N && new_c >= 0 && new_c < M && new_d < dist[new_r][new_c] && grid[new_r][new_c] != '#') {
+						queue.add(new State(new_r, new_c, new_d)); // add new cell to the queue with an incremented distance
+						dist[new_r][new_c] = new_d; // set the new cell to visited
+					}
+				}
+			}
+		}
+
+		in.close();
+	}
+}
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>BFS</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.java</scope>
+	<description>Breadth First Search</description>
+</snippet>
