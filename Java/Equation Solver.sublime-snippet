@@ -1,0 +1,72 @@
+<snippet>
+	<content><![CDATA[
+TreeMap<String, Integer> map = new TreeMap<>();
+map.put("+", 1);
+map.put("-", 1);
+map.put("*", 2);
+map.put("/", 2);
+		
+ArrayList<String> postfix = new ArrayList<String>();
+Stack<String> stack = new Stack<String>();
+String line = in.readLine();
+String[] lines = line.split(" ");
+for (int i = 0; i < lines.length; ++i) {
+	String s = lines[i];
+	if (map.containsKey(s)) {
+		while (!stack.isEmpty()) {
+			if (map.get(stack.peek()) >= map.get(s)) {
+				postfix.add(stack.pop());
+			}
+			else break;
+		}
+		stack.push(s);
+	}
+	else {
+		postfix.add(s);
+	}
+}
+while (!stack.isEmpty()) {
+	postfix.add(stack.pop());
+}
+boolean error = false;
+Stack<Integer> stk = new Stack<Integer>();
+for (int i = 0; i < postfix.size(); ++i) {
+	if (map.containsKey(postfix.get(i))) {
+		int a = stk.pop();
+		int b = stk.pop();
+		if (postfix.get(i).equals("+")) {
+			stk.push(b + a);
+		}
+		else if (postfix.get(i).equals("-")) {
+			stk.push(b - a);
+		}
+		else if (postfix.get(i).equals("*")) {
+			stk.push(b * a);
+		}
+		else {
+			if (a == 0) {
+				error = true;
+				break;
+			}
+			stk.push(b / a);
+		}
+	}
+	else {
+		int num = Integer.parseInt(postfix.get(i));
+		stk.push(num);
+	}
+}
+
+if (error) {
+	System.out.println("Infinity");
+}
+else {
+	System.out.println(stk.pop());
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>postfix</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.java</scope>
+	<description>Equation Solver (Infix to Postfix)</description>
+</snippet>
