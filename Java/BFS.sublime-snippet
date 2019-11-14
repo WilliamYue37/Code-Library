@@ -3,7 +3,7 @@
 import java.util.*;
 import java.io.*;
 
-public class BFS {
+public class ${TM_FILENAME/(.+)\..+/$1/} {
 
 	static class State {
 		int r, c, d; // "d" stores the distance it takes to reach cell (r, c) from the start
@@ -15,29 +15,29 @@ public class BFS {
 		}
 	}
 
-	// directional arrays to help with transitioning from one cell to another - NOTE* this is an advanced trick, it's ok if you don't understand it for now
+	// directional arrays to help with transitioning from one cell to another
 	static int[] dr = {-1, 0, 1, 0};
 	static int[] dc = {0, 1, 0, -1};
 
 	public static void main(String[] args) throws Exception {
-		Scanner in = new Scanner(new File("BFS.in"));
+		Scanner in = new Scanner(new File("${TM_FILENAME/(.+)\..+/$1/}.in"));
 
-		int testCases = in.nextInt();
-		for (int tc = 0; tc < testCases; tc++) { // loop through all the test cases
+		int T = in.nextInt();
+		while (T-- > 0) {
 			int N = in.nextInt(), M = in.nextInt();
 			char[][] grid = new char[N][M]; // matrix to store the grid
 
 			// input the grid
-			int start_r = 0, start_c = 0, end_r = 0, end_c = 0; // start is fred's starting position, end is fred's ending position
+			int start_r = 0, start_c = 0, end_r = 0, end_c = 0;
 			for (int r = 0; r < N; r++) {
 				String line = in.next();
 				for (int c = 0; c < M; c++) {
 					grid[r][c] = line.charAt(c);
-					if (grid[r][c] == 'S') { // assign fred's start position 
+					if (grid[r][c] == 'S') { // assign starting position 
 						start_r = r;
 						start_c = c;
 					}
-					if (grid[r][c] == 'E') { // assign fred's ending position
+					if (grid[r][c] == 'E') { // assign ending position
 						end_r = r;
 						end_c = c;
 					}
@@ -54,7 +54,7 @@ public class BFS {
 				State cur = queue.poll(); // remove the first State in the queue
 				int r = cur.r, c = cur.c, d = cur.d;
 
-				if (d >= dist[r][c]) continue;
+				if (d > dist[r][c]) continue;
 
 				for (int i = 0; i < 4; ++i) {
 					int new_r = r + dr[i], new_c = c + dc[i], new_d = d + 1; // uses directional arrays to transition from one cell to an adjacent cell (please reference global 'dr' and 'dc' arrays for more info)
@@ -65,6 +65,9 @@ public class BFS {
 					}
 				}
 			}
+
+			if (dist[end_r][end_c] != (1 << 29)) System.out.println(dist[end_r][end_c]);
+			else System.out.println("IMPOSSIBLE");
 		}
 
 		in.close();
