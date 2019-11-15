@@ -21,10 +21,10 @@ class CHT {
 public:
     multiset<Sol> hull;
 
-    void insert(Sol part) {
+    void insert(Sol part, int x = 0) {
         auto same = hull.lower_bound(part);
         if (same != hull.end() && same->m == part.m) {
-            if (same->compute(part.x) >= part.compute(part.x)) return;
+            if (same->compute(x) >= part.compute(x)) return;
             hull.erase(same);
         }
 
