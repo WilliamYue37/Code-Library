@@ -1,10 +1,10 @@
 <snippet>
 	<content><![CDATA[
-ll fastExpo(int base, int e) {
+ll fastExpo (int base, int e) {
     ll ans = 1;
-    while(e != 0) {
-        if(e % 2 == 1) ans = (ll) ans * base % MOD;
-        base = (ll) base * base % MOD;
+    while (e != 0) {
+        if (e % 2 == 1) ans = (ll)ans * base % MOD;
+        base = (ll)base * base % MOD;
         e /= 2;
     }
     return ans;
