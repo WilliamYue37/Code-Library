@@ -1,17 +1,16 @@
 <snippet>
 	<content><![CDATA[
 vector<string> split(string s, string delimiter) {
-	vector<string> ret;
-	auto start = 0U;
-	auto end = s.find(delimiter);
-    while (end != string::npos)
-    {
+    vector<string> ret;
+    auto start = 0;
+    auto end = s.find(delimiter);
+    while (end != string::npos) {
         ret.push_back(s.substr(start, end - start));
         start = end + delimiter.length();
         end = s.find(delimiter, start);
     }
     ret.push_back(s.substr(start, end));
-	return ret;
+    return ret;
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
