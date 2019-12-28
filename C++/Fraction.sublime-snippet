@@ -1,54 +1,40 @@
 <snippet>
 	<content><![CDATA[
-class Fraction {
-    private:
-        // both arguments have to be positive
-        long long gcd(long long a, long long b) {
-            while (a != b) {
-                if (a > b) {
-                    a -= b;
-                } else {
-                    b -= a;
-                }
-            }
-            return a;
-        }
+struct Fraction {
+    long long numerator, denominator;
 
-    public:
-        long long numerator, denominator;
+    Fraction() {
+        numerator = 0;
+        denominator = 1;
+    }
 
-        Fraction() {
+    Fraction(long long n, long long d) {
+        if (d==0) {
+            cerr << "Denominator may not be 0." << endl;
+            exit(0);
+        } else if (n == 0) {
             numerator = 0;
             denominator = 1;
-        }
-
-        Fraction(long long n, long long d) {
-            if (d==0) {
-                cerr << "Denominator may not be 0." << endl;
-                exit(0);
-            } else if (n == 0) {
-                numerator = 0;
-                denominator = 1;
-            } else {
-                int sign = 1;
-                if (n < 0) {
-                    sign *= -1;
-                    n *= -1;
-                }
-                if (d < 0) {
-                    sign *= -1;
-                    d *= -1;
-                }
-
-                long long tmp = gcd(n, d);
-                numerator = n/tmp*sign;
-                denominator = d/tmp;
+        } else {
+            int sign = 1;
+            if (n < 0) {
+                sign *= -1;
+                n *= -1;
             }
-        }
+            if (d < 0) {
+                sign *= -1;
+                d *= -1;
+            }
 
-        operator int() {return (numerator)/denominator;}
-        operator float() {return ((float)numerator)/denominator;}
-        operator double() {return ((double)numerator)/denominator;}
+            long long tmp = __gcd(n, d);
+            numerator = n/tmp*sign;
+            denominator = d/tmp;
+        }
+    }
+
+    operator int() {return (numerator)/denominator;}
+    operator float() {return ((float)numerator)/denominator;}
+    operator double() {return ((double)numerator)/denominator;}
 };
 
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
