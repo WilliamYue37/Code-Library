@@ -1,6 +1,7 @@
 <snippet>
 	<content><![CDATA[
 pi range[MAX_N];
+
 int id = 0;
 void preorder(int u, int p) {
 	range[u].ff = id++;
