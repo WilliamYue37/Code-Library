@@ -6,6 +6,7 @@ using namespace std;
 
 #define ff first
 #define ss second
+#define sz(x) int(x.size())
 
 typedef long long ll;
 typedef long double ld;
