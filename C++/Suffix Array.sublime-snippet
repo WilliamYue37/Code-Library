@@ -1,21 +1,21 @@
 <snippet>
 	<content><![CDATA[
-int N; //length of string T
-string T; //inputed string
-int RA[MAXN], tempRA[MAXN]; //Rank
-int SA[MAXN], tempSA[MAXN]; //Suffix Array
-int c[MAXN]; //used for radix sort
-vector<int> owner; //stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
+int N; // length of string T
+string T; // inputed string
+int RA[MAX_N], tempRA[MAX_N]; // Rank
+int SA[MAX_N], tempSA[MAX_N]; // Suffix Array
+int c[MAX_N]; // used for radix sort
+vector<int> owner; // stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
 
-int M; //length of pattern string
-string P; //pattern string (for string matching)
+int M; // length of pattern string
+string P; // pattern string (for string matching)
 
-int Phi[MAXN]; //stores previous suffix (used for computing longest common prefix)
-int PLCP[MAXN]; //Permuted Longest Common Prefix
-int LCP[MAXN]; //Longest Common Prefix
+int Phi[MAX_N]; // stores previous suffix (used for computing longest common prefix)
+int PLCP[MAX_N]; // Permuted Longest Common Prefix
+int LCP[MAX_N]; // Longest Common Prefix
 
 void countingSort(int k) {
-	int sum, maxi = max(300, N);
+	int sum, maxi = max(300, N); // up to 255 ASCII chars or length of string
 	memset(c, 0, sizeof(c));
 	for (int i = 0; i < N; ++i) {
 		++c[i + k < N ? RA[i + k] : 0];
