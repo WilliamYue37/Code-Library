@@ -58,5 +58,5 @@ int MST(vector<Edge>& edges) { //returns -1 if a MST is not possible
 	<tabTrigger>mst</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
-	<description>Minimum Spanning Tree</description>
+	<description>Kruskal's Minimum Spanning Tree</description>
 </snippet>
