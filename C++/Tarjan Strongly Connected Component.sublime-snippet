@@ -1,7 +1,7 @@
 <snippet>
 	<content><![CDATA[
 int counter, numOfSCCs;
-vector<int> pre(MAXN, -1), low(MAXN, -1), id(MAXN, -1), stk;
+vector<int> pre(MAX_N, -1), low(MAX_N, -1), id(MAX_N, -1), stk;
 void DFSLowLink(int u) {
 	pre[u] = low[u] = counter++;
 	stk.push_back(u);
