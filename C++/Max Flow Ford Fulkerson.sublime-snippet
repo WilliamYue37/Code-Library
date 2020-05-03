@@ -1,18 +1,18 @@
 <snippet>
 	<content><![CDATA[
 int N, source, sink;
-int adjMat[MAX_N][MAX_N];
+int adj[MAX_N][MAX_N];
 bool seen[MAX_N];
 
 int dfs(int u, int amount) {
 	if (u == sink) return amount;
 	seen[u] = true;
 	for (int v = 1; v <= N; ++v) {
-		if (adjMat[u][v] > 0 && !seen[v]) {
-			int sent = dfs(v, min(amount, adjMat[u][v]));
+		if (adj[u][v] > 0 && !seen[v]) {
+			int sent = dfs(v, min(amount, adj[u][v]));
 			if (sent > 0) {
-				adjMat[u][v] -= sent;
-				adjMat[v][u] += sent;
+				adj[u][v] -= sent;
+				adj[v][u] += sent;
 				return sent;
 			}
 		}
@@ -27,7 +27,7 @@ int run() {
 
 	while (sent != 0) {
 		fill(seen, seen + N, false);
-		sent = dfs(source, (1 << 29));
+		sent = dfs(source, (1 << 30));
 		total += sent;
 	}
 
@@ -35,7 +35,7 @@ int run() {
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
-	<tabTrigger>maxFlow</tabTrigger>
+	<tabTrigger>flow</tabTrigger>
 	<!-- Optional: Set a scope to limit where the snippet will trigger -->
 	<scope>source.c++</scope>
 	<description>Max Flow Ford Fulkerson</description>
