@@ -1,12 +1,12 @@
 <snippet>
 	<content><![CDATA[
-int counter, numOfSCCs;
+int counter, numOfSCC;
 vector<int> pre(MAX_N, -1), low(MAX_N, -1), id(MAX_N, -1), stk;
 void DFSLowLink(int u) {
 	pre[u] = low[u] = counter++;
 	stk.push_back(u);
-	for (int i = 0; i < (int)adjList[u].size(); ++i) {
-		int v = adjList[u][i];
+	for (int i = 0; i < sz(adj[u]); ++i) {
+		int v = adj[u][i];
 		if (pre[v] == -1) {
 			DFSLowLink(v);
 		}
@@ -15,11 +15,11 @@ void DFSLowLink(int u) {
 	if (low[u] == pre[u]) {
 		while (true) {
 			int j = stk.back(); stk.pop_back();
-			id[j] = numOfSCCs;
-			low[j] = N+1;
+			id[j] = numOfSCC;
+			low[j] = N + 1;
 			if (u == j) break;
 		}
-		++numOfSCCs;
+		++numOfSCC;
 	}
 }
 ]]></content>
