@@ -1,0 +1,41 @@
+<snippet>
+	<content><![CDATA[
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+vector<pi> pruefer(int n) {
+    vector<int> code;
+    for (int i = 0; i < n - 2; i++) {
+        code.pb(rng() % (n - 2));
+    }
+
+    vector<int> degree(n, 1);
+    for (int i : code)
+        degree[i]++;
+
+    int ptr = 0;
+    while (degree[ptr] != 1)
+        ptr++;
+    int leaf = ptr;
+
+    vector<pi> edges;
+    for (int v : code) {
+        edges.emplace_back(leaf, v);
+        if (--degree[v] == 1 && v < ptr) {
+            leaf = v;
+        } else {
+            ptr++;
+            while (degree[ptr] != 1)
+                ptr++;
+            leaf = ptr;
+        }
+    }
+    edges.emplace_back(leaf, n-1);
+    return edges;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>randomTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope>
+	<description>Generate a random tree</description>
+</snippet>
