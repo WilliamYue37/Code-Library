@@ -5,7 +5,7 @@ string T; // inputed string
 int RA[MAX_N], tempRA[MAX_N]; // Rank
 int SA[MAX_N], tempSA[MAX_N]; // Suffix Array
 int c[MAX_N]; // used for radix sort
-vector<int> owner; // stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
+vector<int> owner; // for generalized suffix arrays - stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
 
 int M; // length of pattern string
 string P; // pattern string (for string matching)
@@ -15,7 +15,7 @@ int PLCP[MAX_N]; // Permuted Longest Common Prefix
 int LCP[MAX_N]; // Longest Common Prefix
 
 void countingSort(int k) {
-	int sum, maxi = max(300, N); // up to 255 ASCpi chars or length of string
+	int sum, maxi = max(300, N); // up to 255 ASCII chars or length of string
 	memset(c, 0, sizeof(c));
 	for (int i = 0; i < N; ++i) {
 		++c[i + k < N ? RA[i + k] : 0];
@@ -74,8 +74,8 @@ pi stringMatching() {
 		if (res >= 0) hi = mid;
 		else lo = mid + 1;
 	}
-	if (T.compare(SA[lo], T.length() - SA[lo], P) != 0) return pi(-1, -1);
-	pi ans; ans.first = lo;
+	if (T.compare(SA[lo], T.length() - SA[lo], P) != 0) return {-1, -1};
+	pi ans; ans.ff = lo;
 	lo = 0; hi = N - 1; mid = lo;
 	while (lo < hi) {
 		mid = (lo + hi) / 2;
@@ -84,7 +84,7 @@ pi stringMatching() {
 		else lo = mid + 1;
 	}
 	if (T.compare(SA[hi], T.length() - SA[hi], P) != 0) --hi;
-	ans.second = hi;
+	ans.ss = hi;
 	return ans;
 }
 
@@ -95,7 +95,7 @@ pi LRS() {
 			maxLCP = LCP[i], idx = i;
 		}
 	}
-	return pi(maxLCP, idx);
+	return {maxLCP, idx};
 }
 
 pi LCS() {
@@ -105,7 +105,7 @@ pi LCS() {
 			maxLCP = LCP[i], idx = i;
 		}
 	}
-	return pi(maxLCP, idx);
+	return {maxLCP, idx};
 }
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
