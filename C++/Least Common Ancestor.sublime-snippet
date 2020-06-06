@@ -4,7 +4,7 @@ int depth[MAX_N], parent[MAX_N][MAX_LOG]; // must be 1-indexed, the parent of th
 
 void DFS(int u, int p, int d) {
 	depth[u] = d; parent[u][0] = p;
-	for (int v: adjList[u]) {
+	for (int v: adj[u]) {
 		if (v != p) DFS(v, u, d + 1);
 	}
 }
