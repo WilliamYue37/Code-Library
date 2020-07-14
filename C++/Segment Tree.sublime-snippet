@@ -7,7 +7,7 @@ struct SegmentTree {
     SegmentTree() {}
     SegmentTree(int N) {
         this->N = N;
-        sum.resize(4 * N + 1);
+        mini.resize(4 * N + 1);
         delta.resize(4 * N + 1);
         //you don't need to init unless default values are not zero
         //init(1, 0, this->N - 1);
