@@ -8,7 +8,7 @@ void calcSize(int u, int p) {
 	parent[u] = p;
 	subtreeSize[u] = 1;
 
-	for (pi e: adjList[u]) {
+	for (pi e: adj[u]) {
 		if (e.ff != p && !blocked[e.ff]) {
 			calcSize(e.ff, u);
 			subtreeSize[u] += subtreeSize[e.ff];
@@ -28,19 +28,19 @@ ll go(int entryPoint) {
 
 	q.push(entryPoint);
 	while (!q.empty()) {
-		int i = q.front(); q.pop();
+		int u = q.front(); q.pop();
 
-		int size = subtreeSize[entryPoint] - subtreeSize[i];
+		int size = subtreeSize[entryPoint] - subtreeSize[u];
 
-		for (pi e: adjList[i]) {
-			if (e.ff != parent[i] && !blocked[e.ff]) {
+		for (pi e: adj[u]) {
+			if (e.ff != parent[u] && !blocked[e.ff]) {
 				size = max(size, subtreeSize[e.ff]);
 				q.push(e.ff);
 			}
 		}
 
 		if (size < bestSize) {
-			centroid = i;
+			centroid = u;
 			bestSize = size;
 		}
 	}
@@ -48,7 +48,7 @@ ll go(int entryPoint) {
 	ll ways = solveTree(centroid);
 
 	blocked[centroid] = true;
-	for (pi e: adjList[centroid]) {
+	for (pi e: adj[centroid]) {
 		if (!blocked[e.ff]) {
 			ways += go(e.ff);
 		}
