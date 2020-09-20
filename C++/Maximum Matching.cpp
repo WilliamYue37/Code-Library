@@ -1,0 +1,69 @@
+const int NIL = 0; //NOT in list
+//L and R are the sizes of the left and right sides of a bipartite graph, respectively
+//pairL stores pair of u in the matching where u is a vertex on the left side, pairR does the same thing
+//dist[u] stores the distances of the left side vertices, dist[u] is one more than dist[u'] if u is next to u' in the augmenting path
+//adjList stores the adjacents of the left side vertex u, u ranges from 1 - L, 0 (NIL) is used as a dummy vertex
+//nodes have to be 1-indexed, nodes in L have to be labeled 1 - L, nodes in R have to be labeled 1 - R
+int L, R;
+vector<int> pairL, pairR, dist, adjList[MAX_L];
+bool BFS() { //returns true if there is an augmenting path, else returns false
+	queue<int> q;
+	for (int u = 1; u <= L; ++u) {
+		if (pairL[u] == NIL) {
+			dist[u] = 0;
+			q.push(u);
+		}
+		else dist[u] = INF;
+	}
+
+	dist[NIL] = INF;
+
+	while (!q.empty()) {
+		int u = q.front(); q.pop();
+		if (dist[u] < dist[NIL]) {
+			for (int v: adjList[u]) {
+				if (dist[pairR[v]] == INF) {
+					dist[pairR[v]] = dist[u] + 1;
+					q.push(pairR[v]);
+				}
+			}
+		}
+	}
+
+	return dist[NIL] != INF;
+}
+
+bool DFS(int u) { //returns true if there is an augmenting path beginning with free vertex u
+	if (u != NIL) {
+		for (int v: adjList[u]) {
+			if (dist[pairR[v]] == dist[u] + 1) {
+				if (DFS(pairR[v])) {
+					pairR[v] = u;
+					pairL[u] = v;
+					return true;
+				}
+			}
+		}
+
+		dist[u] = INF;
+		return false;
+	}
+
+	return true;
+}
+
+int hopcroftKarp() { //returns the size of maximum matching
+	//initialize pairL and pairR to NIL
+	pairL.resize(L + 1);
+	pairR.resize(R + 1);
+	dist.resize(L + 1);
+
+	int res = 0;
+	while (BFS()) { //continue updating matching while there still is an augmenting path
+		for (int u = 1; u <= L; ++u) {
+			if (pairL[u] == NIL && DFS(u)) ++res;
+		}
+	}
+
+	return res;
+}

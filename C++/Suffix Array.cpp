@@ -1,0 +1,107 @@
+int N; // length of string T
+string T; // inputed string
+int RA[MAX_N], tempRA[MAX_N]; // Rank
+int SA[MAX_N], tempSA[MAX_N]; // Suffix Array
+int c[MAX_N]; // used for radix sort
+vector<int> owner; // for generalized suffix arrays - stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
+
+int M; // length of pattern string
+string P; // pattern string (for string matching)
+
+int Phi[MAX_N]; // stores previous suffix (used for computing longest common prefix)
+int PLCP[MAX_N]; // Permuted Longest Common Prefix
+int LCP[MAX_N]; // Longest Common Prefix
+
+void countingSort(int k) {
+	int sum, maxi = max(300, N); // up to 255 ASCII chars or length of string
+	memset(c, 0, sizeof(c));
+	for (int i = 0; i < N; ++i) {
+		++c[i + k < N ? RA[i + k] : 0];
+	}
+	for (int i = sum = 0; i < maxi; ++i) {
+		int t = c[i]; c[i] = sum; sum += t;
+	}
+	for (int i = 0; i < N; ++i) {
+		tempSA[c[SA[i] + k < N ? RA[SA[i] + k] : 0]++] = SA[i];
+	}
+	for (int i = 0; i < N; ++i) {
+		SA[i] = tempSA[i];
+	}
+}
+
+void constructSA() {
+	int r;
+	for (int i = 0; i < N; ++i) RA[i] = T[i];
+	for (int i = 0; i < N; ++i) SA[i] = i;
+	for (int k = 1; k < N; k <<= 1) {
+		countingSort(k);
+		countingSort(0);
+		tempRA[SA[0]] = r = 0;
+		for (int i = 1; i < N; ++i) {
+			tempRA[SA[i]] = (RA[SA[i]] == RA[SA[i - 1]] && RA[SA[i] + k] == RA[SA[i - 1] + k]) ? r : ++r;
+		}
+		for (int i = 0; i < N; ++i) {
+			RA[i] = tempRA[i];
+		}
+		if (RA[SA[N - 1]] == N - 1) break;
+	}
+}
+
+void computeLCP() {
+	int L;
+	Phi[SA[0]] = -1;
+	for (int i = 0; i < N; ++i) {
+		Phi[SA[i]] = SA[i - 1];
+	}
+	for (int i = L = 0; i < N; ++i) {
+		if (Phi[i] == -1) {PLCP[i] = 0; continue;}
+		while (T[i + L] == T[Phi[i] + L]) ++L;
+		PLCP[i] = L;
+		L = max(L - 1, 0);
+	}
+	for (int i = 0; i < N; ++i) {
+		LCP[i] = PLCP[SA[i]];
+	}
+}
+
+pi stringMatching() {
+	int lo = 0, hi = N - 1, mid = lo;
+	while (lo < hi) {
+		mid = (lo + hi) / 2;
+		int res = T.compare(SA[mid], T.length() - SA[mid], P);
+		if (res >= 0) hi = mid;
+		else lo = mid + 1;
+	}
+	if (T.compare(SA[lo], T.length() - SA[lo], P) != 0) return {-1, -1};
+	pi ans; ans.ff = lo;
+	lo = 0; hi = N - 1; mid = lo;
+	while (lo < hi) {
+		mid = (lo + hi) / 2;
+		int res = T.compare(SA[mid], T.length() - SA[mid], P);
+		if (res > 0) hi = mid;
+		else lo = mid + 1;
+	}
+	if (T.compare(SA[hi], T.length() - SA[hi], P) != 0) --hi;
+	ans.ss = hi;
+	return ans;
+}
+
+pi LRS() {
+	int idx = 0, maxLCP = -1;
+	for (int i = 1; i < N; ++i) {
+		if (LCP[i] > maxLCP) {
+			maxLCP = LCP[i], idx = i;
+		}
+	}
+	return {maxLCP, idx};
+}
+
+pi LCS() {
+	int idx = 0, maxLCP = -1;
+	for (int i = 1; i < N; ++i) {
+		if (owner[SA[i]] != owner[SA[i - 1]] && LCP[i] > maxLCP) {
+			maxLCP = LCP[i], idx = i;
+		}
+	}
+	return {maxLCP, idx};
+}
