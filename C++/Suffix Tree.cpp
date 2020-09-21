@@ -49,7 +49,7 @@ struct SuffixTree {
 	void init(string str) {
 		makeNode(-1, 0); node = pos = 0;
 		for (char c: str) extend(c);
-		extend('\$'); s.pop_back(); // terminal char
+		extend('$'); s.pop_back(); // terminal char
 	}
 
 	int maxPre(string x) { // max prefix of x which is substring
