@@ -1,6 +1,6 @@
-int dist[MAX_N];
-int bellmanFord(bool& hasNegativeCycle) {
-	fill(dist, dist + MAX_N, INF);
+pair<int, bool> bellmanFord() {
+	bool hasNegativeCycle = false;
+	vector<int> dist(N + 1, INF);
 	dist[1] = 0;
 	for (int i = 0; i < N - 1; ++i) {
 		for (int u = 1; u <= N; ++u) {
@@ -20,5 +20,5 @@ int bellmanFord(bool& hasNegativeCycle) {
 		}
 	}
 
-	return dist[N];
+	return {dist[N], hasNegativeCycle};
 }
