@@ -9,7 +9,7 @@ void init() {
 	}
 }
 
-int query(int l, int r) { //inclusive range
+int query(int l, int r) {
 	int j = (int)log2(r - l + 1);
 	return min(sparse[l][j], sparse[r - (1 << j) + 1][j]);
 }
