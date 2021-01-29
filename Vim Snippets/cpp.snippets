@@ -1,2914 +1,1537 @@
 snippet manacher "Manacher's Longest Palindromic Substring"
 vector<int> manacher(string& orig) {
-
 	string s = "@"; for (char c: orig) s += c, s += '#'; s.back() = '&';
-
 	vector<int> ans(sz(s) - 1);
-
 	int lo = 0, hi = 0;
-
 	for (int i = 1; i < sz(s) - 1; ++i) {
-
 		if (i != 1) ans[i] = min(hi - i, ans[hi - i + lo]);
-
 		while (s[i - ans[i] - 1] == s[i + ans[i] + 1]) ++ans[i];
-
 		if (i + ans[i] > hi) lo = i - ans[i], hi = i + ans[i];
-
 	}
-
 	ans.erase(begin(ans));
-
 	for (int i = 0; i < sz(ans); ++i) if ((i & 1) == (ans[i] & 1)) ++ans[i];
-
 	return ans;
-
 }
 endsnippet
 
 snippet factors "Factors of N"
 vector<int> factors(int n) {
-
 	vector<int> ret;
-
 	for (int j = 1; j * j <= n; ++j) {
-
 		if (n % j == 0) {
-
 			ret.push_back(j);
-
 			if (n / j != j) ret.push_back(n / j);
-
 		}
-
 	}
-
 	return ret;
-
 }
 endsnippet
 
 snippet treap "Lazy Treap"
 struct Node {
-
     int key, priority;
-
     Node *l, *r;
-
     int sz; long long sum; //range queries
-
     bool flip; //lazy update
 
-
-
     Node(int key) {
-
         this->key = key; priority = rand() + (rand() << 15); l = r = NULL;
-
         sz = 1; sum = key; flip = false;
-
     }
-
 };
 
-
-
 int getSize(Node* t) {return t != NULL ? t->sz : 0;}
-
 long long getSum(Node* t) {return t != NULL ? t->sum : 0;}
 
-
-
 Node* push(Node* t) {
-
     if (t == NULL || !t->flip) return t;
-
     swap(t->l, t->r);
-
     t->flip = false;
-
     if (t->l != NULL) t->l->flip ^= 1;
-
     if (t->r != NULL) t->r->flip ^= 1;
-
     return t;
-
 }
-
-
 
 Node* pull(Node* t) {
-
     assert(!t->flip);
-
     push(t->l), push(t->r);
-
     t->sz = 1 + getSize(t->l) + getSize(t->r);
-
     t->sum = t->key + getSum(t->l) + getSum(t->r);
-
     return t;
-
 }
-
-
 
 // >= v goes to the right
-
 pair<Node*, Node*> split(Node* t, int key) {
-
     if (t == NULL) return {t, t};
-
     push(t);
-
     if (t->key >= key) {
-
         auto p = split(t->l, key); t->l = p.second;
-
         return {p.first, pull(t)};
-
     }
-
     else {
-
         auto p = split(t->r, key); t->r = p.first;
-
         return {pull(t), p.second};
-
     }
-
 }
-
-
 
 pair<Node*, Node*> splitSize(Node* t, int sz) {
-
     if (t == NULL) return {t, t};
-
     push(t);
-
     if (getSize(t->l) >= sz) {
-
         auto p = splitSize(t->l, sz); t->l = p.second;
-
         return {p.first, pull(t)};
-
     }
-
     else {
-
         auto p = splitSize(t->r, sz - getSize(t->l) - 1); t->r = p.first;
-
         return {pull(t), p.second};
-
     }
-
 }
-
-
 
 //all keys in left must be < then all keys int right
-
 Node* merge(Node* left, Node* right) {
-
     if (left == NULL || right == NULL) return left != NULL ? left : right;
-
     push(left), push(right);
-
     Node* t;
-
     if (left->priority > right->priority) left->r = merge(left->r, right), t = left;
-
     else right->l = merge(left, right->l), t = right;
-
     return pull(t);
-
 }
-
-
 
 Node* insert(Node* t, int key) {
-
     auto a = split(t, key), b = split(a.second, key + 1);
-
     return merge(a.first, merge(new Node(key), b.second));
-
 }
-
-
 
 Node* del(Node* t, int key) {
-
     auto a = split(t, key), b = split(a.second, key + 1);
-
     return merge(a.first, b.second);
-
 }
 
-
-
 bool contains(Node* t, int key) {
-
     if (t == NULL) return false; if (t->key == key) return true;
-
     return contains(t->l, key) || contains(t->r, key);
-
 }
 endsnippet
 
 snippet scc "Tarjan Strongly Connected Component"
 int counter = 0, numOfSCC = 0;
-
 vector<int> pre(MAX_N, -1), low(MAX_N, -1), id(MAX_N, -1), stk;
-
 void DFSLowLink(int u) {
-
 	pre[u] = low[u] = counter++;
-
 	stk.push_back(u);
-
 	for (int v: adj[u]) {
-
 		if (pre[v] == -1) DFSLowLink(v);
-
 		low[u] = min(low[u], low[v]);
-
 	}
-
 	if (low[u] == pre[u]) {
-
 		while (true) {
-
 			int j = stk.back(); stk.pop_back();
-
 			id[j] = numOfSCC;
-
 			low[j] = N + 1;
-
 			if (u == j) break;
-
 		}
-
 		++numOfSCC;
-
 	}
-
 }
 endsnippet
 
 snippet diameter "Tree Diameter"
 bool found[MAX_N];
 
-
-
 pi BFS(int start) { //return {endpoint, longest path from start}
-
     queue<pi> q; //{node, dist}
-
     q.push({start, 0});
-
     pi ret; //answer
-
     found[start] = true;
-
     while (!q.empty()) {
-
         int u = q.front().ff, d = q.front().ss;
-
         if (d > ret.ss) ret = q.front();
-
         q.pop();
-
         for (pi edge: adjList[u]) {
-
             int v = edge.ff, w = edge.ss;
-
             if (!found[v]) {
-
                 found[v] = true;
-
                 q.push({v, d + w});
-
             }
-
         }
-
     }
-
     return ret;
-
 }
 
-
-
 pair<int, pi> diameter() { //returns {diameter, {endpoint, endpoint}}
-
     memset(found, 0, sizeof found);
-
     int end1 = BFS(1).ff;
-
     memset(found, 0, sizeof found);
-
     pi res = BFS(end1);
-
     return {res.ss, {end1, res.ff}};
-
 }
 endsnippet
 
 snippet kadane "Kadane Max Sum Subarray"
 int kadane(vector<int> &a) {
-
 	int maxEndingHere = 0, maxSoFar = 0;
-
 	for (int i = 0; i < a.size(); ++i) {
-
 		maxEndingHere = max(maxEndingHere + a[i], 0);
-
 		maxSoFar = max(maxSoFar, maxEndingHere);
-
 	}
-
 	return maxSoFar;
-
 }
 endsnippet
 
 snippet pbds "Policy Based Data Structure"
 #include <ext/pb_ds/assoc_container.hpp>
-
 #include <ext/pb_ds/tree_policy.hpp>
-
-
 
 using namespace std;
 
-
-
 template <class T>
-
 using ordered_set = __gnu_pbds::tree<T, __gnu_pbds::null_type, less<T>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
-
 template <class T> //CANNOT ERASE FROM ORDERED MULTISET!!
-
 using ordered_multiset = __gnu_pbds::tree<T, __gnu_pbds::null_type, less_equal<T>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
-
 template <class K, class T>
-
 using hash_map = __gnu_pbds::gp_hash_table<K,T>;
-
 template<class K, class T, class L>
-
 using hash_map_custom_hash = __gnu_pbds::gp_hash_table<K,T,L>;
 endsnippet
 
 snippet preorder "Preorder"
 pi range[MAX_N];
 
-
-
 int id = 0;
-
 void preorder(int u, int p) {
-
 	range[u].ff = id++;
-
 	for (int v: adj[u]) {
-
 		if (v != p) preorder(v, u);
-
 	}
-
 	range[u].ss = id - 1;
-
 }
 endsnippet
 
 snippet modOperations "Mod Operations"
 int fastExpo(int base, int e) {
-
     int ans = 1;
-
     while (e != 0) {
-
         if (e % 2 == 1) ans = (ll)ans * base % MOD;
-
         base = (ll)base * base % MOD;
-
         e /= 2;
-
     }
-
     return ans;
-
 }
-
-
 
 namespace modOp {
-
     int add(int a, int b, int mod = MOD) {return ((ll)a + b + mod) % mod; /*int r = a + b; if (r >= mod) r -= mod; return r;*/}
-
     void ADD(int& a, int b, int mod = MOD) {a = ((ll)a + b + mod) % mod; /*a += b; if (a >= mod) a -= mod;*/}
-
     int sub(int a, int b, int mod = MOD) {return ((ll)a - b + mod) % mod; /*int r = a - b; if (r < 0) r += mod; return r;*/}
-
     void SUB(int& a, int b, int mod = MOD) {a = ((ll)a - b + mod) % mod; /*a -= b; if (a < 0) a += mod;*/}
-
     int mul(int a, int b, int mod = MOD) {return (ll)a * b % mod;}
-
     void MUL(int& a, int b, int mod = MOD) {a = (ll)a * b % mod;}
-
     int divide(int a, int b, int mod = MOD) {return (ll)a * fastExpo(b, mod - 2) % mod;}
-
     void DIVIDE(int& a, int b, int mod = MOD) {a = (ll)a * fastExpo(b, mod - 2) % mod;}
-
 }
-
 using namespace modOp;
 endsnippet
 
 snippet heavyLight "Heavy Light Decompostion"
 class HeavyLight {
-
 public:
-
 	int parent[MAXN], heavy[MAXN], depth[MAXN], root[MAXN], treePos[MAXN];
-
 	SegmentTree segtree;
 
-
-
 	HeavyLight() {
-
 		fill(heavy, heavy + MAXN, -1);
-
 		parent[0] = -1, depth[0] = 0;
-
 		DFS(0);
-
 		for (int i = 0, currentPos = 0; i < N; ++i) {
-
 			if (parent[i] == -1 || heavy[parent[i]] != i) {
-
 				for (int j = i; j != -1; j = heavy[j]) {
-
 					root[j] = i;
-
 					treePos[j] = currentPos++;
-
 				}
-
 			}
-
 		}
-
 	}
-
-
 
 	int DFS(int u) {
-
 		int size = 1, maxSubtree = 0;
-
 		for (int v: adjList[u]) if(v != parent[u]) {
-
 			parent[v] = u;
-
 			depth[v] = depth[u] + 1;
-
 			int subtree = DFS(v);
-
 			if (subtree > maxSubtree) {
-
 				heavy[u] = v;
-
 				maxSubtree = subtree;
-
 			}
-
 			size += subtree;
-
 		}
-
 		return size;
-
 	}
-
-
 
 	template <typename BinaryOperation>
-
 	void processPath(int u, int v, BinaryOperation op) {
-
 		for (; root[u] != root[v]; v = parent[root[v]]) {
-
 			if (depth[root[u]] > depth[root[v]]) swap(u, v);
-
 			op(treePos[root[v]], treePos[v]);
-
 		}
-
 		if (depth[u] > depth[v]) swap(u, v);
-
 		op(treePos[u] + 1, treePos[v]);
-
 	}
-
-
 
 	void modifyPath(int u, int v, int value) {
-
 		processPath(u, v, [this, &value](int l, int r) {segtree.update(l, r, value);});
-
 	}
-
-
 
 	int queryPath(int u, int v) {
-
 		int res = 0;
-
 		processPath(u, v, [this, &res](int l, int r) {res += segtree.query(l, r);});
-
 		return res;
-
 	}
-
 };
 endsnippet
 
 snippet matching "Hopcroft-Karp Maximum Matching on Bipartite Graphs"
 const int NIL = 0; //NOT in list
-
 //L and R are the sizes of the left and right sides of a bipartite graph, respectively
-
 //pairL stores pair of u in the matching where u is a vertex on the left side, pairR does the same thing
-
 //dist[u] stores the distances of the left side vertices, dist[u] is one more than dist[u'] if u is next to u' in the augmenting path
-
 //adjList stores the adjacents of the left side vertex u, u ranges from 1 - L, 0 (NIL) is used as a dummy vertex
-
 //nodes have to be 1-indexed, nodes in L have to be labeled 1 - L, nodes in R have to be labeled 1 - R
-
 int L, R;
-
 vector<int> pairL, pairR, dist, adjList[MAX_L];
-
 bool BFS() { //returns true if there is an augmenting path, else returns false
-
 	queue<int> q;
-
 	for (int u = 1; u <= L; ++u) {
-
 		if (pairL[u] == NIL) {
-
 			dist[u] = 0;
-
 			q.push(u);
-
 		}
-
 		else dist[u] = INF;
-
 	}
-
-
 
 	dist[NIL] = INF;
 
-
-
 	while (!q.empty()) {
-
 		int u = q.front(); q.pop();
-
 		if (dist[u] < dist[NIL]) {
-
 			for (int v: adjList[u]) {
-
 				if (dist[pairR[v]] == INF) {
-
 					dist[pairR[v]] = dist[u] + 1;
-
 					q.push(pairR[v]);
-
 				}
-
 			}
-
 		}
-
 	}
-
-
 
 	return dist[NIL] != INF;
-
 }
-
-
 
 bool DFS(int u) { //returns true if there is an augmenting path beginning with free vertex u
-
 	if (u != NIL) {
-
 		for (int v: adjList[u]) {
-
 			if (dist[pairR[v]] == dist[u] + 1) {
-
 				if (DFS(pairR[v])) {
-
 					pairR[v] = u;
-
 					pairL[u] = v;
-
 					return true;
-
 				}
-
 			}
-
 		}
-
-
 
 		dist[u] = INF;
-
 		return false;
-
 	}
-
-
 
 	return true;
-
 }
 
-
-
 int hopcroftKarp() { //returns the size of maximum matching
-
 	//initialize pairL and pairR to NIL
-
 	pairL.resize(L + 1);
-
 	pairR.resize(R + 1);
-
 	dist.resize(L + 1);
 
-
-
 	int res = 0;
-
 	while (BFS()) { //continue updating matching while there still is an augmenting path
-
 		for (int u = 1; u <= L; ++u) {
-
 			if (pairL[u] == NIL && DFS(u)) ++res;
-
 		}
-
 	}
 
-
-
 	return res;
-
 }
 endsnippet
 
 snippet bit "Binary Indexed Tree"
 struct BIT {
-
 	int N;
-
 	vector<int> bit;
-
-
 
 	BIT() {}
 
-
-
 	BIT(int N) {
-
 		this->N = N;
-
 		bit = vector<int>(N + 1);
-
 	}
-
-
 
 	int query(int index) {
-
 		++index; int sum = 0;
-
 		while (index > 0) {
-
 			sum += bit[index];
-
 			index -= index & -index;
-
 		}
-
 		return sum;
-
 	}
-
-
 
 	int query(int l, int r) {
-
 		return query(r) - (l == 0 ? 0 : query(l - 1));
-
 	}
-
-
 
 	void update(int index, int val) {
-
 		++index;
-
 		while (index <= N) {
-
 			bit[index] += val;
-
 			index += index & -index;
-
 		}	
-
 	}
-
 };
 endsnippet
 
 snippet editDistance "Edit Distance"
 int dp[MAXA][MAXB]; //size of string a, size of string b, 1-indexed
 
-
-
 int editDistance(string a, string b) {
-
 	for (int i = 1; i <= a.size(); i++){
-
 		for (int j = 1; j <= b.size(); j++) {
-
 			if (a[i - 1] == b[j - 1]){
-
 				dp[i][j] = dp[i - 1][j - 1] + 1;
-
 			}
-
 			else {
-
 				dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
-
 			}
-
 		}
-
 	}
-
 	return dp[a.size()][b.size()];
-
 }
 endsnippet
 
 snippet lcm ""
 int lcm(int a, int b) {
-
 	return a * (b / gcd(a, b));
-
 }
 endsnippet
 
 snippet polygon "Polygon Methods"
 #define EPS 1e-9
-
 #define PI acos(-1.0)
-
-
 
 double DEG_to_RAD(double d) { return d * PI / 180.0; }
 
-
-
 double RAD_to_DEG(double r) { return r * 180.0 / PI; }
 
-
-
 struct point { double x, y;   // only used if more precision is needed
-
   point() { x = y = 0.0; }                      // default constructor
-
   point(double _x, double _y) : x(_x), y(_y) {}        // user-defined
-
   bool operator == (point other) const {
-
    return (fabs(x - other.x) < EPS && (fabs(y - other.y) < EPS)); } };
 
-
-
 struct vec { double x, y;  // name: `vec' is different from STL vector
-
   vec(double _x, double _y) : x(_x), y(_y) {} };
 
-
-
 vec toVec(point a, point b) {       // convert 2 points to vector a->b
-
   return vec(b.x - a.x, b.y - a.y); }
 
-
-
 double dist(point p1, point p2) {                // Euclidean distance
-
   return hypot(p1.x - p2.x, p1.y - p2.y); }           // return double
 
-
-
 // returns the perimeter, which is the sum of Euclidian distances
-
 // of consecutive line segments (polygon edges)
-
 double perimeter(const vector<point> &P) {
-
   double result = 0.0;
-
   for (int i = 0; i < (int)P.size()-1; i++)  // remember that P[0] = P[n-1]
-
     result += dist(P[i], P[i+1]);
-
   return result; }
 
-
-
 // returns the area, which is half the determinant
-
 double area(const vector<point> &P) {
-
   double result = 0.0, x1, y1, x2, y2;
-
   for (int i = 0; i < (int)P.size()-1; i++) {
-
     x1 = P[i].x; x2 = P[i+1].x;
-
     y1 = P[i].y; y2 = P[i+1].y;
-
     result += (x1 * y2 - x2 * y1);
-
   }
-
   return fabs(result) / 2.0; }
-
-
 
 double dot(vec a, vec b) { return (a.x * b.x + a.y * b.y); }
 
-
-
 double norm_sq(vec v) { return v.x * v.x + v.y * v.y; }
 
-
-
 double angle(point a, point o, point b) {  // returns angle aob in rad
-
   vec oa = toVec(o, a), ob = toVec(o, b);
-
   return acos(dot(oa, ob) / sqrt(norm_sq(oa) * norm_sq(ob))); }
-
-
 
 double cross(vec a, vec b) { return a.x * b.y - a.y * b.x; }
 
-
-
 // note: to accept collinear points, we have to change the `> 0'
-
 // returns true if point r is on the left side of line pq
-
 bool ccw(point p, point q, point r) {
-
   return cross(toVec(p, q), toVec(p, r)) > 0; }
 
-
-
 // returns true if point r is on the same line as the line pq
-
 bool collinear(point p, point q, point r) {
-
   return fabs(cross(toVec(p, q), toVec(p, r))) < EPS; }
 
-
-
 // returns true if we always make the same turn while examining
-
 // all the edges of the polygon one by one
-
 bool isConvex(const vector<point> &P) {
-
   int sz = (int)P.size();
-
   if (sz <= 3) return false;   // a point/sz=2 or a line/sz=3 is not convex
-
   bool isLeft = ccw(P[0], P[1], P[2]);               // remember one result
-
   for (int i = 1; i < sz-1; i++)            // then compare with the others
-
     if (ccw(P[i], P[i+1], P[(i+2) == sz ? 1 : i+2]) != isLeft)
-
       return false;            // different sign -> this polygon is concave
-
   return true; }                                  // this polygon is convex
 
-
-
 // returns true if point p is in either convex/concave polygon P
-
 bool inPolygon(point pt, const vector<point> &P) {
-
   if ((int)P.size() == 0) return false;
-
   double sum = 0;    // assume the first vertex is equal to the last vertex
-
   for (int i = 0; i < (int)P.size()-1; i++) {
-
     if (ccw(pt, P[i], P[i+1]))
-
          sum += angle(P[i], pt, P[i+1]);                   // left turn/ccw
-
     else sum -= angle(P[i], pt, P[i+1]); }                 // right turn/cw
-
   return fabs(fabs(sum) - 2*PI) < EPS; }
 
-
-
 // line segment p-q intersect with line A-B.
-
 point lineIntersectSeg(point p, point q, point A, point B) {
-
   double a = B.y - A.y;
-
   double b = A.x - B.x;
-
   double c = B.x * A.y - A.x * B.y;
-
   double u = fabs(a * p.x + b * p.y + c);
-
   double v = fabs(a * q.x + b * q.y + c);
-
   return point((p.x * v + q.x * u) / (u+v), (p.y * v + q.y * u) / (u+v)); }
 
-
-
 // cuts polygon Q along the line formed by point a -> point b
-
 // (note: the last point must be the same as the first point)
-
 vector<point> cutPolygon(point a, point b, const vector<point> &Q) {
-
   vector<point> P;
-
   for (int i = 0; i < (int)Q.size(); i++) {
-
     double left1 = cross(toVec(a, b), toVec(a, Q[i])), left2 = 0;
-
     if (i != (int)Q.size()-1) left2 = cross(toVec(a, b), toVec(a, Q[i+1]));
-
     if (left1 > -EPS) P.push_back(Q[i]);       // Q[i] is on the left of ab
-
     if (left1 * left2 < -EPS)        // edge (Q[i], Q[i+1]) crosses line ab
-
       P.push_back(lineIntersectSeg(Q[i], Q[i+1], a, b));
-
   }
-
   if (!P.empty() && !(P.back() == P.front()))
-
     P.push_back(P.front());        // make P's first point = P's last point
-
   return P; }
 
-
-
 point pivot;
-
 bool angleCmp(point a, point b) {                 // angle-sorting function
-
   if (collinear(pivot, a, b))                               // special case
-
     return dist(pivot, a) < dist(pivot, b);    // check which one is closer
-
   double d1x = a.x - pivot.x, d1y = a.y - pivot.y;
-
   double d2x = b.x - pivot.x, d2y = b.y - pivot.y;
-
   return (atan2(d1y, d1x) - atan2(d2y, d2x)) < 0; }   // compare two angles
 
-
-
 vector<point> CH(vector<point> P) {   // the content of P may be reshuffled
-
   int i, j, n = (int)P.size();
-
   if (n <= 3) {
-
     if (!(P[0] == P[n-1])) P.push_back(P[0]); // safeguard from corner case
-
     return P;                           // special case, the CH is P itself
-
   }
 
-
-
   // first, find P0 = point with lowest Y and if tie: rightmost X
-
   int P0 = 0;
-
   for (i = 1; i < n; i++) 
-
     if (P[i].y < P[P0].y || (P[i].y == P[P0].y && P[i].x > P[P0].x))
-
       P0 = i;
-
-
 
   point temp = P[0]; P[0] = P[P0]; P[P0] = temp;    // swap P[P0] with P[0]
 
-
-
   // second, sort points by angle w.r.t. pivot P0
-
   pivot = P[0];                    // use this global variable as reference
-
   sort(++P.begin(), P.end(), angleCmp);              // we do not sort P[0]
 
-
-
   // third, the ccw tests
-
   vector<point> S;
-
   S.push_back(P[n-1]); S.push_back(P[0]); S.push_back(P[1]);   // initial S
-
   i = 2;                                         // then, we check the rest
-
   while (i < n) {           // note: N must be >= 3 for this method to work
-
     j = (int)S.size()-1;
-
     if (ccw(S[j-1], S[j], P[i])) S.push_back(P[i++]);  // left turn, accept
-
     else S.pop_back(); }   // or pop the top of S until we have a left turn
-
   return S; }                                          // return the result
 endsnippet
 
 snippet segmentTree2D "2-D Segment Tree"
 struct SegmentTree {
-
     int N;
-
     vector<int> sum;
 
-
-
     SegmentTree() {}
-
     SegmentTree(int N) {
-
         this->N = 1;
-
         while (this->N < N) this->N <<= 1;
-
         sum.resize(2 * this->N + 1);
-
     }
-
-
 
     void update(int l, int r, int val) {rec(1, 0, N - 1, l, r, val, 0);} //inclusive range
 
-
-
     int query(int l, int r) {return rec(1, 0, N - 1, l, r, 0, 1);} //inclusive range
 
-
-
     void pull(int i) {
-
         sum[i] = sum[2 * i] + sum[2 * i + 1];
-
     }
 
-
-
     int rec(int i, int lo, int hi, int l, int r, int val, int type) {
-
         if (r < lo || hi < l) return 0;
-
         if (l <= lo && hi <= r) {
-
             if (type == 0) sum[i] = val;
-
             return sum[i];
-
         }
 
-
-
         int m = (lo + hi) / 2;
-
         int sumLeft = rec(2 * i, lo, m, l, r, val, type);
-
         int sumRight = rec(2 * i + 1, m + 1, hi, l, r, val, type);
-
-
 
         pull(i);
 
-
-
         return sumLeft + sumRight;
-
     }
-
 };
 
-
-
 struct SegmentTree2D {
-
     int N, M;
-
     vector<SegmentTree> tree;
 
-
-
     SegmentTree2D() {}
-
     SegmentTree2D(int N, int M) {
-
         this->N = 1; this->M = 1;
-
         while (this->N < N) this->N <<= 1;
-
         while (this->M < M) this->M <<= 1;
-
         tree.resize(2 * this->N + 1);
-
         init(1, 0, this->N - 1);
-
     }
-
-
 
     void init(int i, int lo, int hi) {
-
         tree[i] = SegmentTree(this->M);
 
-
-
         if (lo == hi) return;
-
           
-
         int m = (lo + hi) / 2;
-
         init(2 * i, lo, m);
-
         init(2 * i + 1, m + 1, hi);
-
     }
-
-
 
     void update(int x, int y, int val) {update(1, 0, N - 1, x, y, val);} //inclusive range
 
-
-
     int query(int x1, int x2, int y1, int y2) {return query(1, 0, N - 1, x1, x2, y1, y2);} //inclusive range
 
-
-
     void pull(int i, int y) {
-
         for (int j = 0; j < M; ++j) {
-
         	tree[j].update(y, y, tree[2 * j].query(y, y) + tree[2 * j + 1].query(y, y));
-
         }
-
     }
-
-
 
     void update(int i, int lo, int hi, int x, int y, int val) {
-
     	if (x == lo && x == hi) {
-
     	    tree[i].update(y, y, val);
-
     	    return;
-
     	}
 
-
-
     	int m = (lo + hi) / 2;
-
     	if (x <= m) update(2 * i, lo, m, x, y, val);
-
     	else update(2 * i + 1, m + 1, hi, x, y, val);
 
-
-
     	pull(i, y);
-
     }
-
-
 
     int query(int i, int lo, int hi, int x1, int x2, int y1, int y2) {
-
     	if (x2 < lo || hi < x1) return 0;
-
     	if (x1 <= lo && hi <= x2) return tree[i].query(y1, y2);
 
-
-
     	int m = (lo + hi) / 2;
-
     	return query(2 * i, lo, m, x1, x2, y1, y2) + query(2 * i + 1, m + 1, hi, x1, x2, y1, y2);
-
     }
-
 };
 endsnippet
 
 snippet split "Splits a string using a delimiter"
 vector<string> split(string s, string delimiter) {
-
     vector<string> ret;
-
     auto start = 0;
-
     auto end = s.find(delimiter);
-
     while (end != string::npos) {
-
         ret.push_back(s.substr(start, end - start));
-
         start = end + delimiter.length();
-
         end = s.find(delimiter, start);
-
     }
-
     ret.push_back(s.substr(start, end));
-
     return ret;
-
 }
 endsnippet
 
 snippet centroidDecomposition "Centroid Decomposition"
 int parent[MAX_N], subtreeSize[MAX_N];
-
 bool blocked[MAX_N];
-
 queue<int> q;
 
-
-
 void calcSize(int u, int p) {
-
 	parent[u] = p;
-
 	subtreeSize[u] = 1;
 
-
-
 	for (pi e: adj[u]) {
-
 		if (e.ff != p && !blocked[e.ff]) {
-
 			calcSize(e.ff, u);
-
 			subtreeSize[u] += subtreeSize[e.ff];
-
 		}
-
 	}
-
 }
-
-
 
 ll solveTree(int root) {
-
 	return 0;
-
 }
 
-
-
 ll go(int entryPoint) {
-
 	calcSize(entryPoint, entryPoint);
 
-
-
 	int centroid = entryPoint;
-
 	int bestSize = subtreeSize[entryPoint];
 
-
-
 	q.push(entryPoint);
-
 	while (!q.empty()) {
-
 		int u = q.front(); q.pop();
-
-
 
 		int size = subtreeSize[entryPoint] - subtreeSize[u];
 
-
-
 		for (pi e: adj[u]) {
-
 			if (e.ff != parent[u] && !blocked[e.ff]) {
-
 				size = max(size, subtreeSize[e.ff]);
-
 				q.push(e.ff);
-
 			}
-
 		}
-
-
 
 		if (size < bestSize) {
-
 			centroid = u;
-
 			bestSize = size;
-
 		}
-
 	}
-
-
 
 	ll ways = solveTree(centroid);
 
-
-
 	blocked[centroid] = true;
-
 	for (pi e: adj[centroid]) {
-
 		if (!blocked[e.ff]) {
-
 			ways += go(e.ff);
-
 		}
-
 	}
 
-
-
 	return ways;
-
 }
 endsnippet
 
 snippet diffChecker "Difference Checker"
 #include <bits/stdc++.h>
 
-
-
 using namespace std;
 
-
-
 #define ff first
-
 #define ss second
-
 #define MOD 1000000007
 
-
-
 typedef long long ll;
-
 typedef pair<int, int> pi;
 
-
-
 int main() {
-
 	ifstream file1("");
-
 	ifstream file2("");
-
 	ios_base::sync_with_stdio(0); cin.tie(0);
-
 	
-
 	int line = 1;
-
 	string s;
-
 	while (file1 >> s) {
-
 		string s2; file2 >> s2;
-
 		if (s != s2) cout << line << '\n';
-
 		++line;
-
 	}
 
-
-
 	return 0;
-
 }
 endsnippet
 
 snippet alien "Parameter Search / Alien's Trick"
 ll lo = 0, hi = INF, ans = -1;
-
 pl memo_left, memo_right;
-
 while (lo <= hi) {
-
 	ll x = (lo + hi) / 2;
-
 	pl prev = {-arr[1], 0};
-
 	dp[0].ff = INF;
-
 	for (int i = 1; i <= N; ++i) {
-
 		dp[i] = min(pl{dp[i - 1].ff - arr[i - 1] + arr[i], dp[i - 1].ss}, pl{prev.ff + arr[i] + x, prev.ss + 1});
-
 		prev = min(prev, pl{dp[i].ff - arr[i + 1], dp[i].ss});
-
 	}
-
 	ll val = dp[N].ff - x * dp[N].ss;
-
 	if (dp[N].ss == K) {
-
 		ans = val;
-
 		break;
-
 	}
-
 	else if (dp[N].ss < K) {
-
 		memo_left = {dp[N].second, val};
-
 		hi = x - 1;
-
 	}
-
 	else {
-
 		memo_right = {dp[N].second, val};
-
 		lo = x + 1;
-
 	}
-
 }
-
 // colinear points
-
 if (ans == -1) {
-
 	ans = (memo_right.ss * (memo_left.ff - K) + memo_left.ss * (K - memo_right.ff)) / (memo_left.ff - memo_right.ff);
-
 }
 endsnippet
 
 snippet bcc "Biconnected Component"
 vector<int> adjList[MAXSIZE]; //adjacency list for the grid
-
 set<int> BCCs[MAXSIZE]; //the BCCs of each node in the grid
-
 int counter, rootChildren, counterBCC; //counter = counter for DFSLowLink, rootChildren = # of children for root node, counterBCC = id for BCCs
-
 int pre[MAXSIZE], low[MAXSIZE], parent[MAXSIZE]; //pre, low, and parent vectors for DFSLowLink
-
 stack<Edge*> st; //stack for edges during DFSLowLink
 
-
-
 //DFSLowLink to find data structures
-
 void DFSLowLink(int u) {
-
 	pre[u] = low[u] = counter++;
-
 	for (int i = 0; i < (int)adjList[u].size(); ++i) {
-
 		Edge* e = &adjList[u][i]; int v = e->v;
-
 		if (pre[v] == -1) {
-
 			parent[v] = u;
-
 			st.push(e);
-
 			if (pre[u] == 0) ++rootChildren;
-
 			DFSLowLink(v);
-
 			if ((pre[u] == 0 && rootChildren > 1) || (pre[u] != 0 && pre[u] <= low[v])) {
-
 				while (st.top()->u != u || st.top()->v != v) {
-
 					Edge* e = st.top(); st.pop();
-
 					BCCs[e->u].insert(counterBCC);
-
 					BCCs[e->v].insert(counterBCC);						
-
 				}
-
 				Edge* e = st.top(); st.pop();
-
 				BCCs[e->u].insert(counterBCC);
-
 				BCCs[e->v].insert(counterBCC);
-
 				++counterBCC;
-
 			}
-
 			low[u] = min(low[u], low[v]);
-
 		}
-
 		else if (parent[u] != v) {
-
             if (pre[v] < low[u]) {
-
             	low[u] = pre[v];
-
             	st.push(e);
-
             }
-
 		}
-
 	}
-
 }
 
-
-
 //check if two nodes are in the same BCC
-
 bool sameBCC(int u, int v) {
-
 	for (int i : BCCs[u]) {
-
 		if (BCCs[v].count(i) == 1) return true;
-
 	}
-
 	return false;
-
 }
 endsnippet
 
 snippet eulerPath "Euler's Path/Trail"
 int degree[MAXN];
-
 stack<int> path;
 
-
-
 bool checkDegree() {
-
 	int odd = 0, even = 0;
-
 	for (int i = 1; i <= N; ++i) {
-
 		if (degree[i] % 2 == 1) ++odd;
-
 		else ++even;
-
 	}
-
 	return odd == 2 || odd == 0;
-
 }
 
-
-
 void eulerPath(int u) { //must start on an odd degree node if an odd degree node is present
-
 	if (degree[u] == 0) {
-
 		path.push(u);
-
 		return;
-
 	}
-
-
 
 	while (degree[u]) {
-
 		int v = 1;
-
 		while (!adjMat[u][v]) ++v;
-
 		--adjMat[u][v]; --adjMat[v][u]; --degree[u]; --degree[v];
-
 		eulerPath(v);
-
 	}
 
-
-
 	path.push(u);
-
 }
 endsnippet
 
 snippet usaco "USA Computing Olympiad"
 #include <bits/stdc++.h>
 
-
-
 using namespace std;
 
-
-
 #define ff first
-
 #define ss second
-
 #define sz(x) int(x.size())
 
-
-
 typedef long long ll;
-
 typedef long double ld;
-
 typedef pair<int, int> pi;
-
 typedef pair<ll, ll> pl;
-
 typedef pair<double, double> pd;
 
-
-
 const int MOD = 1e9 + 7;
-
 const ll INF = 1e18;
-
 const double EPS = 1e-6;
 
-
-
 int main() {
-
 	freopen("${TM_FILENAME/(.+)\..+/$1/}.in", "r", stdin); freopen("${TM_FILENAME/(.+)\..+/$1/}.out", "w", stdout);
-
 	ios_base::sync_with_stdio(0); cin.tie(0);
-
 	
-
 	$0
 
-
-
 	return 0;
-
 }
 endsnippet
 
 snippet lca "Least Common Ancestor"
 int depth[MAX_N], parent[MAX_N][MAX_LOG]; // must be 1-indexed, the parent of the root is 0
 
-
-
 void DFS(int u, int p, int d) {
-
 	depth[u] = d; parent[u][0] = p;
-
 	for (int v: adj[u]) {
-
 		if (v != p) DFS(v, u, d + 1);
-
 	}
-
 }
-
-
 
 void LCA_precompute() {
-
 	DFS(1, 0, 0);
-
 	for (int k = 1; k < MAX_LOG; ++k) {
-
 		for (int i = 1; i <= N; ++i) {
-
 			parent[i][k] = parent[parent[i][k - 1]][k - 1];
-
 		}
-
 	}
-
 }
-
-
 
 int lift(int u, int h) {
-
 	for (int i = 0; (1 << i) <= h; ++i) {
-
 		if ((h & (1 << i)) != 0) {
-
 			u = parent[u][i];
-
 		}
-
 	}
-
 	return u;
-
 }
-
-
 
 int LCA(int a, int b) {
-
 	if (depth[a] < depth[b]) {
-
 		b = lift(b, depth[b] - depth[a]);
-
 	}
-
 	else if (depth[b] < depth[a]) {
-
 		a = lift(a, depth[a] - depth[b]);
-
 	}
-
 	if (a == b) return a;
-
 	for (int k = MAX_LOG - 1; k >= 0; --k) {
-
 		if (parent[a][k] != parent[b][k]) {
-
 			a = parent[a][k], b = parent[b][k];
-
 		}
-
 	}
-
 	return parent[a][0];
-
 }
 
-
-
 int dist(int a, int b) {
-
 	int lca = LCA(a, b);
-
 	return depth[a] + depth[b] - 2 * depth[lca];
-
 }
 endsnippet
 
 snippet fastExpo "Fast Exponentation"
 int fastExpo(int base, int e) {
-
     int ans = 1;
-
     while (e != 0) {
-
         if (e % 2 == 1) ans = (ll)ans * base % MOD;
-
         base = (ll)base * base % MOD;
-
         e /= 2;
-
     }
-
     return ans;
-
 }
 endsnippet
 
 snippet edge "Edge Struct"
 struct Edge {
-
 	int u, v, w;
-
 	bool operator < (const Edge &e) const {return this->w < e.w;}
-
 };
 endsnippet
 
 snippet palindrome "Palindrome Check"
 bool isPalindrome(string &s) {
-
 	for (int i = 0; i < s.size(); ++i) {
-
 		if (s[i] != s[s.size() - i - 1]) return false;
-
 	}
-
 	return true;
-
 }
 endsnippet
 
 snippet topologicalSort "Topological Sort"
 int inDegree[MAXN]; queue<int> q;
-
 void topologicalSort(vector<int> &ordering) { //returns topsort in vector "ordering"
-
 	for (int u = 1; u <= N; ++u) if (inDegree[u] == 0) q.push(u);
-
 	while (!q.empty()) {
-
 		int u = q.front(); q.pop();
-
 		ordering.push_back(u);
-
 		for (int v: adjList[u]) {
-
 			--inDegree[v];
-
 			if (inDegree[v] == 0) q.push(v);
-
 		}
-
 	}
-
 }
 endsnippet
 
 snippet fraction "Fraction Class"
 struct Fraction {
-
     long long numerator, denominator;
 
-
-
     Fraction() {
-
         numerator = 0;
-
         denominator = 1;
-
     }
-
-
 
     Fraction(long long n, long long d) {
-
         if (d==0) {
-
             cerr << "Denominator may not be 0." << endl;
-
             exit(0);
-
         } else if (n == 0) {
-
             numerator = 0;
-
             denominator = 1;
-
         } else {
-
             int sign = 1;
-
             if (n < 0) {
-
                 sign *= -1;
-
                 n *= -1;
-
             }
-
             if (d < 0) {
-
                 sign *= -1;
-
                 d *= -1;
-
             }
-
-
 
             long long tmp = __gcd(n, d);
-
             numerator = n/tmp*sign;
-
             denominator = d/tmp;
-
         }
-
     }
-
-
 
     operator int() {return (numerator)/denominator;}
-
     operator float() {return ((float)numerator)/denominator;}
-
     operator double() {return ((double)numerator)/denominator;}
-
 };
 
-
-
 Fraction operator+(const Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.denominator
-
                 +rhs.numerator*lhs.denominator,
-
                 lhs.denominator*rhs.denominator);
-
     return tmp;
-
 }
-
-
 
 Fraction operator+=(Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.denominator
-
                 +rhs.numerator*lhs.denominator,
-
                 lhs.denominator*rhs.denominator);
-
     lhs = tmp;
-
     return lhs;
-
 }
-
-
 
 Fraction operator-(const Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.denominator
-
                 -rhs.numerator*lhs.denominator,
-
                 lhs.denominator*rhs.denominator);
-
     return tmp;
-
 }
-
-
 
 Fraction operator-=(Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.denominator
-
                 -rhs.numerator*lhs.denominator,
-
                 lhs.denominator*rhs.denominator);
-
     lhs = tmp;
-
     return lhs;
-
 }
-
-
 
 Fraction operator*(const Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.numerator,
-
                lhs.denominator*rhs.denominator);
-
     return tmp;
-
 }
-
-
 
 Fraction operator*=(Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.numerator,
-
                lhs.denominator*rhs.denominator);
-
     lhs = tmp;
-
     return lhs;
-
 }
-
-
 
 Fraction operator*(int lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs*rhs.numerator,rhs.denominator);
-
     return tmp;
-
 }
-
-
 
 Fraction operator*(const Fraction& rhs, int lhs) {
-
     Fraction tmp(lhs*rhs.numerator,rhs.denominator);
-
     return tmp;
-
 }
-
-
 
 Fraction operator/(const Fraction& lhs, const Fraction& rhs) {
-
     Fraction tmp(lhs.numerator*rhs.denominator,
-
                  lhs.denominator*rhs.numerator);
-
     return tmp;
-
 }
 
-
-
 std::ostream& operator<<(std::ostream &strm, const Fraction &a) {
-
     if (a.denominator == 1) {
-
         strm << a.numerator;
-
     } else {
-
         strm << a.numerator << "/" << a.denominator;
-
     }
-
     return strm;
-
 }
 endsnippet
 
 snippet dir "Intercardinal Directions"
 int dr[] = {-1, 0, 1, 0, -1, 1, 1, -1};
-
 int dc[] = {0, 1, 0, -1, 1, 1, -1, -1};
 endsnippet
 
 snippet dijkstra "Dijkstra"
 vector<int> dijkstra(int start) {
-
 	vector<int> dist(N + 1, INF);
-
 	priority_queue<pi, vector<pi>, greater<pi>> pq;
-
 	pq.push({start, 0}); //u, dist
-
 	dist[start] = 0;
-
 	while (!pq.empty()) {
-
 		int u = pq.top().ff, d = pq.top().ss; pq.pop();
-
 		if (d > dist[u]) continue;
-
 		for (auto edge : adj[u]) {
-
 			int v = edge.ff, w = edge.ss;
-
 			if (dist[u] + w < dist[v]) {
-
 				pq.push({v, dist[u] + w});
-
 				dist[v] = dist[u] + w;
-
 			}
-
 		}
-
 	}
-
 	return dist;
-
 }
 endsnippet
 
 snippet cht ""
 struct Sol {
-
     int m;
-
     ll b;
 
-
-
     ll compute(int x) const {
-
         return (ll)m * x + b;
-
     }
-
-
 
     ld intersect(Sol r) const {
-
         return (ld)(this->b - r.b)/(r.m - this->m);
-
     }
-
-
 
     bool operator<(const Sol& other) const {
-
         return this->m < other.m;
-
     }
-
 };
 
-
-
 class CHT {
-
 public:
-
     multiset<Sol> hull;
 
-
-
     void insert(Sol part, int x = 0) {
-
         auto same = hull.lower_bound(part);
-
         if (same != hull.end() && same->m == part.m) {
-
             if (same->compute(x) >= part.compute(x)) return;
-
             hull.erase(same);
-
         }
-
-
 
         auto above = hull.upper_bound(part);
-
         auto below = hull.lower_bound(part);
-
         if (above != hull.end() && below != hull.begin() && (--below)->intersect(part) >= part.intersect(*above)) return;
 
-
-
         while (true) {
-
             auto up1 = hull.upper_bound(part);
-
             if (up1 == hull.end()) break;
-
             auto up2 = hull.upper_bound(*up1);
-
             if (up2 == hull.end()) break;
 
-
-
             ll t1 = part.intersect(*up1);
-
             ll t2 = up1->intersect(*up2);
 
-
-
             if (t1 < t2) break;
-
-
 
             hull.erase(up1);
-
         }
 
-
-
         while (true) {
-
             auto lo1 = hull.lower_bound(part);
-
             if (lo1 == hull.begin()) break; --lo1;
-
             auto lo2 = hull.lower_bound(*lo1);
-
             if (lo2 == hull.begin()) break; --lo2;
 
-
-
             ll t1 = lo2->intersect(*lo1);
-
             ll t2 = lo1->intersect(part);
-
-
 
             if (t1 < t2) break;
 
-
-
             hull.erase(lo1);
-
         }
-
-
 
         hull.insert(part);
-
     }
-
-
 
     ll query(int x) {
-
         while (hull.size() >= 2) {
-
             Sol f = *hull.begin();
-
             Sol s = *hull.upper_bound(f);
-
             if (f.compute(x) > s.compute(x)) break;
-
             hull.erase(hull.begin());
-
         }
-
         if (hull.size() > 0) return hull.begin()->compute(x);
-
         else return -1;
-
     }
-
 };
 endsnippet
 
 snippet primeFactorization "Prime Factorization"
 vector<int> primeFactorization(int n) {
-
 	vector<int> ret;
-
 	while (n % 2 == 0) {
-
 		n /= 2; ret.push_back(2);
-
 	}
-
-
 
 	for (int i = 3; i * i <= n; i += 2) {
-
 		while (n % i == 0) {
-
 			n /= i; ret.push_back(i);
-
 		}
-
 	}
-
-
 
 	if (n > 2) ret.push_back(n);
 
-
-
 	return ret;
-
 }
 endsnippet
 
 snippet bellmanFord "Bellman Ford"
 pair<int, bool> bellmanFord() {
-
 	bool hasNegativeCycle = false;
-
 	vector<int> dist(N + 1, INF);
-
 	dist[1] = 0;
-
 	for (int i = 0; i < N - 1; ++i) {
-
 		for (int u = 1; u <= N; ++u) {
-
 			for (int j = 0; j < sz(adj[u]); ++j) {
-
 				pi v = adj[u][j];
-
 				dist[v.ff] = min(dist[v.ff], dist[u] + v.ss);
-
 			}
-
 		}
-
 	}
-
-
 
 	for (int u = 1; u <= N; ++u) {
-
 		for (int j = 0; j < sz(adj[u]); ++j) {
-
 			pi v = adj[u][j];
-
 			if (dist[v.ff] > dist[u] + v.ss) {
-
 				hasNegativeCycle = true;
-
 			}
-
 		}
-
 	}
 
-
-
 	return {dist[N], hasNegativeCycle};
-
 }
 endsnippet
 
 snippet apsp "Floyd Warshall"
 for (int k = 1; k <= N; ++k) {
-
 	for (int i = 1; i <= N; ++i) {
-
 		for (int j = 1; j <= N; ++j) {
-
 			adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
-
 		}
-
 	}
-
 }
 endsnippet
 
 snippet segmentTree "Segment Tree"
 struct SegmentTree {
-
     int N;
-
     vector<int> mini, delta;
 
-
-
     SegmentTree() {}
-
     SegmentTree(int N) {
-
         this->N = N;
-
         mini.resize(4 * N + 1);
-
         delta.resize(4 * N + 1);
-
         //you don't need to init unless default values are not zero
-
         //init(1, 0, this->N - 1);
-
     }
-
-
 
     void update(int l, int r, int val) {rec(1, 0, N - 1, l, r, val, 0);} //inclusive range
 
-
-
     int query(int l, int r) {return rec(1, 0, N - 1, l, r, 0, 1);} //inclusive range
 
-
-
     void init(int i, int lo, int hi) {
-
         //if default segtree values are not zero, initialize node i
-
         if (lo == hi) return;
-
           
-
         int m = (lo + hi) / 2;
-
         init(2 * i, lo, m);
-
         init(2 * i + 1, m + 1, hi);
-
     }
-
-
 
     void push(int i) {
-
         delta[2 * i] += delta[i];
-
         delta[2 * i + 1] += delta[i];
-
         delta[i] = 0;
-
     }
-
-
 
     void pull(int i) {
-
         mini[i] = min(mini[2 * i] + delta[2 * i], mini[2 * i + 1] + delta[2 * i + 1]);
-
     }
 
-
-
     int rec(int i, int lo, int hi, int l, int r, int val, int type) {
-
         if (r < lo || hi < l) return INF;
-
         if (l <= lo && hi <= r) {
-
             if (type == 0) delta[i] += val;
-
             return mini[i] + delta[i];
-
         }
-
-
 
         push(i);
 
-
-
         int m = (lo + hi) / 2;
-
         int minLeft = rec(2 * i, lo, m, l, r, val, type);
-
         int minRight = rec(2 * i + 1, m + 1, hi, l, r, val, type);
-
-
 
         pull(i);
 
-
-
         return min(minLeft, minRight);
-
     }
-
 };
 endsnippet
 
 snippet erdosGallai "Erdos-Gallai Graph Realization"
 bool check(vector<int> &degree) {
-
     sort(degree.begin(), degree.end(), greater<int>());
-
     vector<int> freq(MAXNUM + 1); //MAXNUM is the largest degree value
-
     long long sum = 0;
-
     for (int i = 0; i < degree.size(); ++i) {
-
 		++freq[degree[i]];
-
 		sum += degree[i];
-
     }
-
     long long left = 0, right = 0; int less = 0;
-
     for (int k = 1, i = 0; k <= degree.size() && i < degree.size(); ++k, ++i) {
-
         left += degree[i];
-
         --freq[degree[i]];
-
         right -= min(degree[i], k - 1);
-
         if (degree[i] < k - 1) --less;
-
         less += freq[k - 1];
-
         right += degree.size() - k - less;
-
         if (left > (long long)k * (k - 1) + right) return false;
-
     }
-
     return true;
-
 }
 endsnippet
 
 snippet linkedList "Linked List"
 struct ListNode {
-
 	ListNode *prev, *next;
-
 	int value;
-
 };
 
-
-
 struct LinkedList {
-
 	ListNode *front, *back;
 
-
-
 	void addFront(LinkedList& l) {
-
 		l.back->next = front;
-
 		front->prev = l.back;
-
 		front = l.front;
-
 	}
-
-
 
 	void addFront(ListNode* l) {
-
 		front->prev = l;
-
 		l->next = front;
-
 		front = l;
-
 	}
-
-
 
 	void addBack(LinkedList& l) {
-
 		back->next = l.front;
-
 		l.front->prev = back;
-
 		back = l.back;
-
 	}
-
-
 
 	void addBack(ListNode* l) {
-
 		back->next = l;
-
 		l->prev = back;
-
 		back = back->next;
-
 	}
-
-
 
 	void print() {
-
 		ListNode* temp = front;
-
 		while (temp != nullptr) {
-
 			cout << temp->value << ' ';
-
 			temp = temp->next;
-
 		}
-
 		cout << '\n';
-
 	}
-
 };
 endsnippet
 
 snippet brokenProfile "Catalan States for Broken Profile DP"
 int cnt = 0;
-
 map<vector<int>, int> stateid;
-
 map<int, vector<int>> stateis;
-
 vector<int> a;
 
-
-
 bool ok() {
-
 	for (int i = 0; i < N; ++i) {
-
 		for (int j = i + 1; j < N; ++j) {
-
 			for (int k = j + 1; k < N; ++k) {
-
 				for (int l = k + 1; l < N; ++l) {
-
 					if (a[i] == a[k] && a[j] == a[l] && a[i] != a[j]) return false;
-
 				}
-
 			}
-
 		}
-
 	}
-
 	return true;
-
 }
-
-
 
 void dfs(int x, int y) {
-
 	if (x == N) {
-
 		if (ok()) {
-
 			stateid[a] = cnt;
-
 			stateis[cnt] = a;
-
 			++cnt;
-
 		}
-
 	}
-
 	else {
-
 		for (int i = 0; i <= y; ++i) {
-
 			a[x] = i;
-
 			dfs(x + 1, max(i + 1, y));
-
 		}
-
 	}
-
 }
-
-
 
 // initiate by running dfs(0, 0) in main method;
 endsnippet
 
 snippet suffixArray "Suffix Array"
 struct SuffixArray {
-
 	int N;
-
 	string T;
-
 	vector<int> RA, tempRA;
-
 	vector<int> SA, tempSA;
-
 	vector<int> c; // used for radix sort
-
 	vector<int> owner; // for generalized suffix arrays - stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
-
 	vector<int> Phi, PLCP, LCP; // Phi stores previous suffix
 
-
-
 	SuffixArray() {}
-
 	SuffixArray(string T) {
-
 		N = sz(T);
-
 		this->T = T;
-
 		RA.resize(N + 1); tempRA.resize(N + 1);
-
 		SA.resize(N + 1); tempSA.resize(N + 1);
-
 		c.resize(max(300, N + 1));
-
 		Phi.resize(N + 1); PLCP.resize(N + 1); LCP.resize(N + 1);
-
 		constructSA();
-
 		computeLCP();
-
 	}
-
-
 
 	void countingSort(int k) {
-
 		int sum, maxi = max(300, N); // up to 255 ASCII chars or length of string
-
 		fill(c.begin(), c.end(), 0);
-
 		for (int i = 0; i < N; ++i) {
-
 			++c[i + k < N ? RA[i + k] : 0];
-
 		}
-
 		for (int i = sum = 0; i < maxi; ++i) {
-
 			int t = c[i]; c[i] = sum; sum += t;
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			tempSA[c[SA[i] + k < N ? RA[SA[i] + k] : 0]++] = SA[i];
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			SA[i] = tempSA[i];
-
 		}
-
 	}
-
-
 
 	void constructSA() {
-
 		int r;
-
 		for (int i = 0; i < N; ++i) RA[i] = T[i];
-
 		for (int i = 0; i < N; ++i) SA[i] = i;
-
 		for (int k = 1; k < N; k <<= 1) {
-
 			countingSort(k);
-
 			countingSort(0);
-
 			tempRA[SA[0]] = r = 0;
-
 			for (int i = 1; i < N; ++i) {
-
 				tempRA[SA[i]] = (RA[SA[i]] == RA[SA[i - 1]] && RA[SA[i] + k] == RA[SA[i - 1] + k]) ? r : ++r;
-
 			}
-
 			for (int i = 0; i < N; ++i) {
-
 				RA[i] = tempRA[i];
-
 			}
-
 			if (RA[SA[N - 1]] == N - 1) break;
-
 		}
-
 	}
-
-
 
 	void computeLCP() {
-
 		int L;
-
 		Phi[SA[0]] = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			Phi[SA[i]] = SA[i - 1];
-
 		}
-
 		for (int i = L = 0; i < N; ++i) {
-
 			if (Phi[i] == -1) {PLCP[i] = 0; continue;}
-
 			while (T[i + L] == T[Phi[i] + L]) ++L;
-
 			PLCP[i] = L;
-
 			L = max(L - 1, 0);
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			LCP[i] = PLCP[SA[i]];
-
 		}
-
 	}
-
-
 
 	pi stringMatching(string P) {
-
 		int lo = 0, hi = N - 1, mid = lo;
-
 		while (lo < hi) {
-
 			mid = (lo + hi) / 2;
-
 			int res = T.compare(SA[mid], N - SA[mid], P);
-
 			if (res >= 0) hi = mid;
-
 			else lo = mid + 1;
-
 		}
-
 		if (T.compare(SA[lo], N - SA[lo], P) != 0) return {-1, -1};
-
 		pi ans; ans.ff = lo;
-
 		lo = 0; hi = N - 1; mid = lo;
-
 		while (lo < hi) {
-
 			mid = (lo + hi) / 2;
-
 			int res = T.compare(SA[mid], N - SA[mid], P);
-
 			if (res > 0) hi = mid;
-
 			else lo = mid + 1;
-
 		}
-
 		if (T.compare(SA[hi], N - SA[hi], P) != 0) --hi;
-
 		ans.ss = hi;
-
 		return ans;
-
 	}
-
-
 
 	pi LRS() {
-
 		int idx = 0, maxLCP = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			if (LCP[i] > maxLCP) {
-
 				maxLCP = LCP[i], idx = i;
-
 			}
-
 		}
-
 		return {maxLCP, idx};
-
 	}
-
-
 
 	pi LCS() {
-
 		int idx = 0, maxLCP = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			if (owner[SA[i]] != owner[SA[i - 1]] && LCP[i] > maxLCP) {
-
 				maxLCP = LCP[i], idx = i;
-
 			}
-
 		}
-
 		return {maxLCP, idx};
-
 	}
-
 };
 endsnippet
 
@@ -2917,2165 +1540,1121 @@ endsnippet
 
 snippet intersect "Intersection of Line Segments"
 //Given three colinear points p, q, r, the function checks if point q lies on line segment 'pr' 
-
 bool onSegment(pi p, pi q, pi r) { 
-
     return q.ff <= max(p.ff, r.ff) && q.ff >= min(p.ff, r.ff) && q.ss <= max(p.ss, r.ss) && q.ss >= min(p.ss, r.ss);
-
 } 
 
-
-
 //To find orientation of ordered triplet (p, q, r)
-
 //The function returns following values:
-
 //0 --> p, q and r are colinear
-
 //1 --> Clockwise
-
 //2 --> Counterclockwise
-
 int orientation(pi p, pi q, pi r) { 
-
     int val = (q.ss - p.ss) * (r.ff - q.ff) - (q.ff - p.ff) * (r.ss - q.ss);
-
     if (val == 0) return 0;  //colinear
-
     return val > 0 ? 1 : 2; //clockwise or counterclockwise 
-
 }
 
-
-
 bool intersect(pi p1, pi q1, pi p2, pi q2) { //returns true if line segment 'p1q1' and 'p2q2' intersect 
-
     //Find the four orientations needed for general and special cases 
-
     int o1 = orientation(p1, q1, p2); 
-
     int o2 = orientation(p1, q1, q2); 
-
     int o3 = orientation(p2, q2, p1); 
-
     int o4 = orientation(p2, q2, q1); 
-
   
-
     //General case 
-
     if (o1 != o2 && o3 != o4) return true; 
-
   
-
     //Special Cases 
-
     if (o1 == 0 && onSegment(p1, p2, q1)) return true; //p1, q1 and p2 are colinear and p2 lies on segment p1q1
-
     if (o2 == 0 && onSegment(p1, q2, q1)) return true; //p1, q1 and q2 are colinear and q2 lies on segment p1q1
-
     if (o3 == 0 && onSegment(p2, p1, q2)) return true; //p2, q2 and p1 are colinear and p1 lies on segment p2q2
-
     if (o4 == 0 && onSegment(p2, q1, q2)) return true; //p2, q2 and q1 are colinear and q1 lies on segment p2q2
-
   
-
     return false; // Doesn't fall in any of the above cases 
-
 }
 endsnippet
 
 snippet gaussianElimination "Gaussian Elimination"
 int gauss(vector<vector<double>> a, vector<double>& ans) { //return 0, 1, or INF solutions; INF is represented by -1
-
     int n = (int)a.size();
-
     int m = (int)a[0].size() - 1;
 
-
-
     vector<int> where (m, -1);
-
     for (int col = 0, row = 0; col < m && row < n; ++col) {
-
         int sel = row;
-
         for (int i = row; i < n; ++i)
-
             if (abs(a[i][col]) > abs(a[sel][col]))
-
                 sel = i;
-
         if (abs(a[sel][col]) < EPS)
-
             continue;
-
         for (int i = col; i <= m; ++i)
-
             swap (a[sel][i], a[row][i]);
-
         where[col] = row;
 
-
-
         for (int i = 0; i < n; ++i)
-
             if (i != row) {
-
                 double c = a[i][col] / a[row][col];
-
                 for (int j = col; j <= m; ++j)
-
                     a[i][j] -= a[row][j] * c;
-
             }
-
         ++row;
-
     }
-
-
 
     ans.assign (m, 0);
-
     for (int i = 0; i < m; ++i)
-
         if (where[i] != -1)
-
             ans[i] = a[where[i]][m] / a[where[i]][i];
-
     for (int i = 0; i < n; ++i) {
-
         double sum = 0;
-
         for (int j = 0; j < m; ++j)
-
             sum += ans[j] * a[i][j];
-
         if (abs(sum - a[i][m]) > EPS)
-
             return 0;
-
     }
 
-
-
     for (int i = 0; i < m; ++i)
-
         if (where[i] == -1)
-
             return -1;
-
     return 1;
-
 }
 endsnippet
 
 snippet codeforces "Codeforces"
 #include <bits/stdc++.h>
 
-
-
 using namespace std;
 
-
-
 #define ff first
-
 #define ss second
-
 #define sz(x) int(x.size())
 
-
-
 typedef long long ll;
-
 typedef long double ld;
-
 typedef pair<int, int> pi;
-
 typedef pair<ll, ll> pl;
-
 typedef pair<double, double> pd;
 
-
-
 const int MOD = 1e9 + 7;
-
 const ll INF = 1e18;
-
 const double EPS = 1e-6;
 
-
-
 int main() {
-
 	ios_base::sync_with_stdio(0); cin.tie(0);
-
 	
-
 	$0
 
-
-
 	return 0;
-
 }
 endsnippet
 
 snippet suffixTree "Ukkonen's Suffix Tree"
 struct SuffixTree {
-
 	string s; 
-
 	int node, pos;
 
-
-
 	struct state { // edge to state is s[fpos, fpos + len)
-
 		int fpos, len, link = -1; map<char, int> to;
-
 		state(int fpos, int len) : fpos(fpos), len(len) {}
-
 	}; vector<state> st;
 
-
-
 	int makeNode(int pos, int len) { 
-
 		st.push_back(state(pos, len));
-
 		return sz(st) - 1; 
-
 	}
-
-
 
 	void travEdge() {
-
 		while (pos > 1 && pos > st[st[node].to[s[sz(s) - pos]]].len) {
-
 			node = st[node].to[s[sz(s) - pos]];
-
 			pos -= st[node].len;
-
 		}
-
 	}
-
-
 
 	void extend(char c) {
-
 		s += c; ++pos; int last = 0;
-
 		while (pos) {
-
 			travEdge();
-
 			char edge = s[sz(s) - pos];
-
 			int& v = st[node].to[edge];
-
 			char t = s[st[v].fpos + pos - 1];
-
 			if (v == 0) {
-
 				v = makeNode(sz(s) - pos, INF);
-
 				st[last].link = node; last = 0;
-
 			}
-
 			else if (t == c) {
-
 				st[last].link = node;
-
 				return;
-
 			} 
-
 			else {
-
 				int u = makeNode(st[v].fpos, pos - 1);
-
 				st[u].to[c] = makeNode(sz(s) - 1, INF);
-
 				st[u].to[t] = v;
-
 				st[v].fpos += pos - 1; st[v].len -= pos - 1;
-
 				v = u; st[last].link = u; last = u;
-
 			}
-
 			if (node == 0) --pos;
-
 			else node = st[node].link;
-
 		}
-
 	}
-
-
 
 	void init(string str) {
-
 		makeNode(-1, 0); node = pos = 0;
-
 		for (char c: str) extend(c);
-
 		extend('\$'); s.pop_back(); // terminal char
-
 	}
-
-
 
 	int maxPre(string x) { // max prefix of x which is substring
-
 		int node = 0, ind = 0;
-
 		while (true) {
-
 			if (ind == sz(x) || !st[node].to.count(x[ind])) return ind;
-
 			node = st[node].to[x[ind]];
-
 			for (int i = 0; i < st[node].len; ++i) {
-
 				if (ind == sz(x) || x[ind] != s[st[node].fpos + i]) return ind;
-
 				++ind;
-
 			}
-
 		}
-
 	}
-
-
 
 	vector<int> sa; // generate suffix array
-
 	void genSa(int x = 0, int len = 0) {
-
 		if (!sz(st[x].to)) { // terminal node
-
 			sa.push_back(st[x].fpos - len);
-
 			if (sa.back() >= sz(s)) sa.pop_back();
-
 		} else {
-
 			len += st[x].len;
-
 			for (auto& p: st[x].to) genSa(p.ss, len);
-
 		}
-
 	}
-
 };
 endsnippet
 
 snippet bigInteger "Big Integer"
 constexpr int digits(int base) noexcept {
-
     return base <= 1 ? 0 : 1 + digits(base / 10);
-
 }
 
-
-
 constexpr int base = 1000'000'000;
-
 constexpr int base_digits = digits(base);
 
-
-
 struct BigInteger {
-
     // value == 0 is represented by empty z
-
     vector<int> z; // digits
 
-
-
     // sign == 1 <==> value >= 0
-
     // sign == -1 <==> value < 0
-
     int sign;
 
-
-
     BigInteger() : sign(1) {
-
     }
-
-
 
     BigInteger(long long v) {
-
         *this = v;
-
     }
-
-
 
     BigInteger &operator=(long long v) {
-
         sign = v < 0 ? -1 : 1;
-
         v *= sign;
-
         z.clear();
-
         for (; v > 0; v = v / base)
-
             z.push_back((int) (v % base));
-
         return *this;
-
     }
-
-
 
     BigInteger(const string &s) {
-
         read(s);
-
     }
-
-
 
     BigInteger &operator+=(const BigInteger &other) {
-
         if (sign == other.sign) {
-
             for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
-
                 if (i == z.size())
-
                     z.push_back(0);
-
                 z[i] += carry + (i < other.z.size() ? other.z[i] : 0);
-
                 carry = z[i] >= base;
-
                 if (carry)
-
                     z[i] -= base;
-
             }
-
         } else if (other != 0 /* prevent infinite loop */) {
-
             *this -= -other;
-
         }
-
         return *this;
-
     }
-
-
 
     friend BigInteger operator+(BigInteger a, const BigInteger &b) {
-
         return a += b;
-
     }
-
-
 
     BigInteger &operator-=(const BigInteger &other) {
-
         if (sign == other.sign) {
-
             if (sign == 1 && *this >= other || sign == -1 && *this <= other) {
-
                 for (int i = 0, carry = 0; i < other.z.size() || carry; ++i) {
-
                     z[i] -= carry + (i < other.z.size() ? other.z[i] : 0);
-
                     carry = z[i] < 0;
-
                     if (carry)
-
                         z[i] += base;
-
                 }
-
                 trim();
-
             } else {
-
                 *this = other - *this;
-
                 this->sign = -this->sign;
-
             }
-
         } else {
-
             *this += -other;
-
         }
-
         return *this;
-
     }
-
-
 
     friend BigInteger
 
-
-
     operator-(BigInteger a, const BigInteger &b) {
-
         return a -= b;
-
     }
-
-
 
     BigInteger &operator*=(int v) {
-
         if (v < 0)
-
             sign = -sign, v = -v;
-
         for (int i = 0, carry = 0; i < z.size() || carry; ++i) {
-
             if (i == z.size())
-
                 z.push_back(0);
-
             long long cur = (long long) z[i] * v + carry;
-
             carry = (int) (cur / base);
-
             z[i] = (int) (cur % base);
-
         }
-
         trim();
-
         return *this;
-
     }
-
-
 
     BigInteger operator*(int v) const {
-
         return BigInteger(*this) *= v;
-
     }
-
-
 
     friend pair<BigInteger, BigInteger> divmod(const BigInteger &a1, const BigInteger &b1) {
-
         int norm = base / (b1.z.back() + 1);
-
         BigInteger a = a1.abs() * norm;
-
         BigInteger b = b1.abs() * norm;
-
         BigInteger q, r;
-
         q.z.resize(a.z.size());
 
-
-
         for (int i = (int) a.z.size() - 1; i >= 0; i--) {
-
             r *= base;
-
             r += a.z[i];
-
             int s1 = b.z.size() < r.z.size() ? r.z[b.z.size()] : 0;
-
             int s2 = b.z.size() - 1 < r.z.size() ? r.z[b.z.size() - 1] : 0;
-
             int d = (int) (((long long) s1 * base + s2) / b.z.back());
-
             r -= b * d;
-
             while (r < 0)
-
                 r += b, --d;
-
             q.z[i] = d;
-
         }
 
-
-
         q.sign = a1.sign * b1.sign;
-
         r.sign = a1.sign;
-
         q.trim();
-
         r.trim();
-
         return {q, r / norm};
-
     }
 
-
-
     friend BigInteger sqrt(const BigInteger &a1) {
-
         BigInteger a = a1;
-
         while (a.z.empty() || a.z.size() % 2 == 1)
-
             a.z.push_back(0);
-
-
 
         int n = a.z.size();
 
-
-
         int firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
-
         int norm = base / (firstDigit + 1);
-
         a *= norm;
-
         a *= norm;
-
         while (a.z.empty() || a.z.size() % 2 == 1)
-
             a.z.push_back(0);
 
-
-
         BigInteger r = (long long) a.z[n - 1] * base + a.z[n - 2];
-
         firstDigit = (int) ::sqrt((double) a.z[n - 1] * base + a.z[n - 2]);
-
         int q = firstDigit;
-
         BigInteger res;
 
-
-
         for (int j = n / 2 - 1; j >= 0; j--) {
-
             for (;; --q) {
-
                 BigInteger r1 = (r - (res * 2 * base + q) * q) * base * base +
-
                             (j > 0 ? (long long) a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
-
                 if (r1 >= 0) {
-
                     r = r1;
-
                     break;
-
                 }
-
             }
-
             res *= base;
-
             res += q;
 
-
-
             if (j > 0) {
-
                 int d1 = res.z.size() + 2 < r.z.size() ? r.z[res.z.size() + 2] : 0;
-
                 int d2 = res.z.size() + 1 < r.z.size() ? r.z[res.z.size() + 1] : 0;
-
                 int d3 = res.z.size() < r.z.size() ? r.z[res.z.size()] : 0;
-
                 q = (int) (((long long) d1 * base * base + (long long) d2 * base + d3) / (firstDigit * 2));
-
             }
-
         }
-
-
 
         res.trim();
-
         return res / norm;
-
     }
-
-
 
     BigInteger operator/(const BigInteger &v) const {
-
         return divmod(*this, v).first;
-
     }
-
-
 
     BigInteger operator%(const BigInteger &v) const {
-
         return divmod(*this, v).second;
-
     }
-
-
 
     BigInteger &operator/=(int v) {
-
         if (v < 0)
-
             sign = -sign, v = -v;
-
         for (int i = (int) z.size() - 1, rem = 0; i >= 0; --i) {
-
             long long cur = z[i] + rem * (long long) base;
-
             z[i] = (int) (cur / v);
-
             rem = (int) (cur % v);
-
         }
-
         trim();
-
         return *this;
-
     }
-
-
 
     BigInteger operator/(int v) const {
-
         return BigInteger(*this) /= v;
-
     }
-
-
 
     int operator%(int v) const {
-
         if (v < 0)
-
             v = -v;
-
         int m = 0;
-
         for (int i = (int) z.size() - 1; i >= 0; --i)
-
             m = (int) ((z[i] + m * (long long) base) % v);
-
         return m * sign;
-
     }
-
-
 
     BigInteger &operator*=(const BigInteger &v) {
-
         *this = *this * v;
-
         return *this;
-
     }
-
-
 
     BigInteger &operator/=(const BigInteger &v) {
-
         *this = *this / v;
-
         return *this;
-
     }
-
-
 
     bool operator<(const BigInteger &v) const {
-
         if (sign != v.sign)
-
             return sign < v.sign;
-
         if (z.size() != v.z.size())
-
             return z.size() * sign < v.z.size() * v.sign;
-
         for (int i = (int) z.size() - 1; i >= 0; i--)
-
             if (z[i] != v.z[i])
-
                 return z[i] * sign < v.z[i] * sign;
-
         return false;
-
     }
-
-
 
     bool operator>(const BigInteger &v) const {
-
         return v < *this;
-
     }
-
-
 
     bool operator<=(const BigInteger &v) const {
-
         return !(v < *this);
-
     }
-
-
 
     bool operator>=(const BigInteger &v) const {
-
         return !(*this < v);
-
     }
-
-
 
     bool operator==(const BigInteger &v) const {
-
         return !(*this < v) && !(v < *this);
-
     }
-
-
 
     bool operator!=(const BigInteger &v) const {
-
         return *this < v || v < *this;
-
     }
-
-
 
     void trim() {
-
         while (!z.empty() && z.back() == 0)
-
             z.pop_back();
-
         if (z.empty())
-
             sign = 1;
-
     }
-
-
 
     bool isZero() const {
-
         return z.empty();
-
     }
-
-
 
     friend BigInteger operator-(BigInteger v) {
-
         if (!v.z.empty())
-
             v.sign = -v.sign;
-
         return v;
-
     }
-
-
 
     BigInteger abs() const {
-
         return sign == 1 ? *this : -*this;
-
     }
-
-
 
     long long longValue() const {
-
         long long res = 0;
-
         for (int i = (int) z.size() - 1; i >= 0; i--)
-
             res = res * base + z[i];
-
         return res * sign;
-
     }
-
-
 
     friend BigInteger gcd(const BigInteger &a, const BigInteger &b) {
-
         return b.isZero() ? a : gcd(b, a % b);
-
     }
-
-
 
     friend BigInteger lcm(const BigInteger &a, const BigInteger &b) {
-
         return a / gcd(a, b) * b;
-
     }
-
-
 
     void read(const string &s) {
-
         sign = 1;
-
         z.clear();
-
         int pos = 0;
-
         while (pos < s.size() && (s[pos] == '-' || s[pos] == '+')) {
-
             if (s[pos] == '-')
-
                 sign = -sign;
-
             ++pos;
-
         }
-
         for (int i = (int) s.size() - 1; i >= pos; i -= base_digits) {
-
             int x = 0;
-
             for (int j = max(pos, i - base_digits + 1); j <= i; j++)
-
                 x = x * 10 + s[j] - '0';
-
             z.push_back(x);
-
         }
-
         trim();
-
     }
-
-
 
     friend istream &operator>>(istream &stream, BigInteger &v) {
-
         string s;
-
         stream >> s;
-
         v.read(s);
-
         return stream;
-
     }
-
-
 
     friend ostream &operator<<(ostream &stream, const BigInteger &v) {
-
         if (v.sign == -1)
-
             stream << '-';
-
         stream << (v.z.empty() ? 0 : v.z.back());
-
         for (int i = (int) v.z.size() - 2; i >= 0; --i)
-
             stream << setw(base_digits) << setfill('0') << v.z[i];
-
         return stream;
-
     }
-
-
 
     static BigInteger pow(const BigInteger &base, const BigInteger &exponent) {
-
         if (exponent == 0) return 1;
-
         if (exponent == 1) return BigInteger(base);
-
         BigInteger ans = pow(base, exponent / 2);
-
         ans = ans * ans;
-
         if (exponent % 2 == 1) ans = ans * base;
-
         return ans;
-
     }
-
-
 
     static vector<int> convert_base(const vector<int> &a, int old_digits, int new_digits) {
-
         vector<long long> p(max(old_digits, new_digits) + 1);
-
         p[0] = 1;
-
         for (int i = 1; i < p.size(); i++)
-
             p[i] = p[i - 1] * 10;
-
         vector<int> res;
-
         long long cur = 0;
-
         int cur_digits = 0;
-
         for (int v : a) {
-
             cur += v * p[cur_digits];
-
             cur_digits += old_digits;
-
             while (cur_digits >= new_digits) {
-
                 res.push_back(int(cur % p[new_digits]));
-
                 cur /= p[new_digits];
-
                 cur_digits -= new_digits;
-
             }
-
         }
-
         res.push_back((int) cur);
-
         while (!res.empty() && res.back() == 0)
-
             res.pop_back();
-
         return res;
-
     }
-
-
 
     typedef vector<long long> vll;
 
-
-
     static vll karatsubaMultiply(const vll &a, const vll &b) {
-
         int n = a.size();
-
         vll res(n + n);
-
         if (n <= 32) {
-
             for (int i = 0; i < n; i++)
-
                 for (int j = 0; j < n; j++)
-
                     res[i + j] += a[i] * b[j];
-
             return res;
-
         }
-
-
 
         int k = n >> 1;
-
         vll a1(a.begin(), a.begin() + k);
-
         vll a2(a.begin() + k, a.end());
-
         vll b1(b.begin(), b.begin() + k);
-
         vll b2(b.begin() + k, b.end());
 
-
-
         vll a1b1 = karatsubaMultiply(a1, b1);
-
         vll a2b2 = karatsubaMultiply(a2, b2);
 
-
-
         for (int i = 0; i < k; i++)
-
             a2[i] += a1[i];
-
         for (int i = 0; i < k; i++)
-
             b2[i] += b1[i];
 
-
-
         vll r = karatsubaMultiply(a2, b2);
-
         for (int i = 0; i < a1b1.size(); i++)
-
             r[i] -= a1b1[i];
-
         for (int i = 0; i < a2b2.size(); i++)
-
             r[i] -= a2b2[i];
 
-
-
         for (int i = 0; i < r.size(); i++)
-
             res[i + k] += r[i];
-
         for (int i = 0; i < a1b1.size(); i++)
-
             res[i] += a1b1[i];
-
         for (int i = 0; i < a2b2.size(); i++)
-
             res[i + n] += a2b2[i];
-
         return res;
-
     }
-
-
 
     BigInteger operator*(const BigInteger &v) const {
-
         vector<int> a6 = convert_base(this->z, base_digits, 6);
-
         vector<int> b6 = convert_base(v.z, base_digits, 6);
-
         vll a(a6.begin(), a6.end());
-
         vll b(b6.begin(), b6.end());
-
         while (a.size() < b.size())
-
             a.push_back(0);
-
         while (b.size() < a.size())
-
             b.push_back(0);
-
         while (a.size() & (a.size() - 1))
-
             a.push_back(0), b.push_back(0);
-
         vll c = karatsubaMultiply(a, b);
-
         BigInteger res;
-
         res.sign = sign * v.sign;
-
         for (int i = 0, carry = 0; i < c.size(); i++) {
-
             long long cur = c[i] + carry;
-
             res.z.push_back((int) (cur % 1000000));
-
             carry = (int) (cur / 1000000);
-
         }
-
         res.z = convert_base(res.z, 6, base_digits);
-
         res.trim();
-
         return res;
-
     }
-
-
 
 };
 
-
-
 BigInteger random_bigint(int n) {
-
     string s;
-
     for (int i = 0; i < n; i++) {
-
         s += rand() % 10 + '0';
-
     }
-
     return BigInteger(s);
-
 }
 endsnippet
 
 snippet bwt "Burrows-Wheeler Transform"
 struct SuffixArray {
-
 	int N;
-
 	string T;
-
 	vector<int> RA, tempRA;
-
 	vector<int> SA, tempSA;
-
 	vector<int> c; // used for radix sort
-
 	vector<int> owner; // for generalized suffix arrays - stores the owner of the first string in suffix_i; owner of special characters is -1; !NOTE! - has to be computed in main method when inputing strings
-
 	vector<int> Phi, PLCP, LCP; // Phi stores previous suffix
 
-
-
 	SuffixArray() {}
-
 	SuffixArray(string T) {
-
 		N = sz(T);
-
 		this->T = T;
-
 		RA.resize(N + 1); tempRA.resize(N + 1);
-
 		SA.resize(N + 1); tempSA.resize(N + 1);
-
 		c.resize(max(300, N + 1));
-
 		Phi.resize(N + 1); PLCP.resize(N + 1); LCP.resize(N + 1);
-
 		constructSA();
-
 		computeLCP();
-
 	}
-
-
 
 	void countingSort(int k) {
-
 		int sum, maxi = max(300, N); // up to 255 ASCII chars or length of string
-
 		fill(c.begin(), c.end(), 0);
-
 		for (int i = 0; i < N; ++i) {
-
 			++c[i + k < N ? RA[i + k] : 0];
-
 		}
-
 		for (int i = sum = 0; i < maxi; ++i) {
-
 			int t = c[i]; c[i] = sum; sum += t;
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			tempSA[c[SA[i] + k < N ? RA[SA[i] + k] : 0]++] = SA[i];
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			SA[i] = tempSA[i];
-
 		}
-
 	}
-
-
 
 	void constructSA() {
-
 		int r;
-
 		for (int i = 0; i < N; ++i) RA[i] = T[i];
-
 		for (int i = 0; i < N; ++i) SA[i] = i;
-
 		for (int k = 1; k < N; k <<= 1) {
-
 			countingSort(k);
-
 			countingSort(0);
-
 			tempRA[SA[0]] = r = 0;
-
 			for (int i = 1; i < N; ++i) {
-
 				tempRA[SA[i]] = (RA[SA[i]] == RA[SA[i - 1]] && RA[SA[i] + k] == RA[SA[i - 1] + k]) ? r : ++r;
-
 			}
-
 			for (int i = 0; i < N; ++i) {
-
 				RA[i] = tempRA[i];
-
 			}
-
 			if (RA[SA[N - 1]] == N - 1) break;
-
 		}
-
 	}
-
-
 
 	void computeLCP() {
-
 		int L;
-
 		Phi[SA[0]] = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			Phi[SA[i]] = SA[i - 1];
-
 		}
-
 		for (int i = L = 0; i < N; ++i) {
-
 			if (Phi[i] == -1) {PLCP[i] = 0; continue;}
-
 			while (T[i + L] == T[Phi[i] + L]) ++L;
-
 			PLCP[i] = L;
-
 			L = max(L - 1, 0);
-
 		}
-
 		for (int i = 0; i < N; ++i) {
-
 			LCP[i] = PLCP[SA[i]];
-
 		}
-
 	}
-
-
 
 	pi stringMatching(string P) {
-
 		int lo = 0, hi = N - 1, mid = lo;
-
 		while (lo < hi) {
-
 			mid = (lo + hi) / 2;
-
 			int res = T.compare(SA[mid], N - SA[mid], P);
-
 			if (res >= 0) hi = mid;
-
 			else lo = mid + 1;
-
 		}
-
 		if (T.compare(SA[lo], N - SA[lo], P) != 0) return {-1, -1};
-
 		pi ans; ans.ff = lo;
-
 		lo = 0; hi = N - 1; mid = lo;
-
 		while (lo < hi) {
-
 			mid = (lo + hi) / 2;
-
 			int res = T.compare(SA[mid], N - SA[mid], P);
-
 			if (res > 0) hi = mid;
-
 			else lo = mid + 1;
-
 		}
-
 		if (T.compare(SA[hi], N - SA[hi], P) != 0) --hi;
-
 		ans.ss = hi;
-
 		return ans;
-
 	}
-
-
 
 	pi LRS() {
-
 		int idx = 0, maxLCP = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			if (LCP[i] > maxLCP) {
-
 				maxLCP = LCP[i], idx = i;
-
 			}
-
 		}
-
 		return {maxLCP, idx};
-
 	}
-
-
 
 	pi LCS() {
-
 		int idx = 0, maxLCP = -1;
-
 		for (int i = 1; i < N; ++i) {
-
 			if (owner[SA[i]] != owner[SA[i - 1]] && LCP[i] > maxLCP) {
-
 				maxLCP = LCP[i], idx = i;
-
 			}
-
 		}
-
 		return {maxLCP, idx};
-
 	}
-
 };
 
-
-
 string BWT(string T) {
-
 	SuffixArray sa(T);
-
 	string res;
-
 	for (int i = 0; i < sz(T); ++i) {
-
 		res += sa.SA[i] == 0 ? '\$' : T[sa.SA[i] - 1];
-
 	}
-
 	return res;
-
 }
 
-
-
 string reverseBWT(string T) {
-
 	vector<int> pre1(sz(T)), pre2(26);
-
 	for (int i = 0; i < sz(T); ++i) {
-
 		if (T[i] != '\$') pre1[i] = pre2[T[i] - 'a']++;
-
 	}
-
 	for (int i = 1; i < 26; ++i) pre2[i] += pre2[i - 1];
-
 	string res = "\$";
-
 	int row = 0;
-
 	while (T[row] != '\$') {
-
 		res = T[row] + res;
-
 		row = (T[row] == 'a' ? 0 : pre2[T[row] - 'a' - 1]) + pre1[row] + 1;
-
 	}
-
 	return res;
-
 }
 endsnippet
 
 snippet matrix "Matrix"
 struct Matrix {
-
     long long** mat;
-
     int a, b;
-
     
-
     Matrix() { a = b = 0; }
 
-
-
     Matrix(int a, int b) {
-
         this->a = a, this->b = b;
-
         mat = new long long*[a];
-
         for (int i = 0; i < a; ++i) {
-
             mat[i] = new long long[b];
-
             for (int j = 0; j < b; ++j) mat[i][j] = 0;
-
         }
-
     }
-
     
-
     Matrix(vector<vector<int>> v) : Matrix(v.size(), v[0].size()) {
-
         for (int i = 0; i < a; ++i) for (int j = 0; j < b; ++j) mat[i][j] = v[i][j];
-
     }
-
     
-
     void print() {
-
         for (int i = 0; i < a; ++i) {
-
             for (int j = 0; j < b; ++j) cout << mat[i][j] << " ";
-
             cout << "\n";
-
         }
-
         cout << "------------\n";
-
     }
-
     
-
     Matrix operator+(const Matrix& m) {
-
         Matrix ret(a, b);
-
         for (int i = 0; i < a; ++i) for (int j = 0; j < b; ++j) ret.mat[i][j] = (mat[i][j] + m.mat[i][j]) % MOD;
-
         return ret;
-
     }
-
     
-
     Matrix operator*(const Matrix& m) {
-
         Matrix ret(a, m.b);
-
         for (int i = 0; i < a; ++i) for (int j = 0; j < b; ++j) for (int k = 0; k < m.b; ++k) 
-
             ret.mat[i][k] = (ret.mat[i][k] + mat[i][j] * m.mat[j][k] % MOD) % MOD;
-
         return ret;
-
     }
-
-
 
     Matrix operator^(ll pow) {
-
         Matrix ret(a, a), base(*this); 
-
         for (int i = 0; i < a; ++i) ret.mat[i][i] = 1;
-
         while (pow) {
-
             if (pow & 1) ret = ret * base;
-
             base = base * base;
-
             pow /= 2;
-
         }
-
         return ret;
-
     }
-
 };
 endsnippet
 
 snippet debug "Debug"
 #define dbg(...) cout << "[" << #__VA_ARGS__ << "]: "; cout << to_string(__VA_ARGS__) << endl
-
 template <typename T, size_t N> int SIZE(const T (&t)[N]){ return N; } template<typename T> int SIZE(const T &t){ return t.size(); } string to_string(const string s, int x1=0, int x2=1e9){ return '"' + ((x1 < s.size()) ? s.substr(x1, x2-x1+1) : "") + '"'; } string to_string(const char* s) { return to_string((string) s); } string to_string(const bool b) { return (b ? "true" : "false"); } string to_string(const char c){ return string({c}); } template<size_t N> string to_string(const bitset<N> &b, int x1=0, int x2=1e9){ string t = ""; for(int __iii__ = min(x1,SIZE(b)),  __jjj__ = min(x2, SIZE(b)-1); __iii__ <= __jjj__; ++__iii__){ t += b[__iii__] + '0'; } return '"' + t + '"'; } template <typename A, typename... C> string to_string(const A (&v), int x1=0, int x2=1e9, C... coords); int l_v_l_v_l = 0, t_a_b_s = 0; template <typename A, typename B> string to_string(const pair<A, B> &p) { l_v_l_v_l++; string res = "(" + to_string(p.first) + ", " + to_string(p.second) + ")"; l_v_l_v_l--; return res; } template <typename A, typename... C> string to_string(const A (&v), int x1, int x2, C... coords) { int rnk = rank<A>::value; string tab(t_a_b_s, ' '); string res = ""; bool first = true; if(l_v_l_v_l == 0) res += '\n'; res += tab + "["; x1 = min(x1, SIZE(v)), x2 = min(x2, SIZE(v)); auto l = begin(v); advance(l, x1); auto r = l; advance(r, (x2-x1) + (x2 < SIZE(v))); for (auto e = l; e != r; e = next(e)) { if (!first) { res += ", "; } first = false; l_v_l_v_l++; if(e != l){ if(rnk > 1) { res += '\n'; t_a_b_s = l_v_l_v_l; }; } else{ t_a_b_s = 0; } res += to_string(*e, coords...); l_v_l_v_l--; } res += "]"; if(l_v_l_v_l == 0) res += '\n'; return res; } void dbgm(){;} template<typename Heads, typename... Tails> void dbgm(Heads H, Tails... T){ cout << to_string(H) << " | "; dbgm(T...); } 
-
 #define dbgm(...) cout << "[" << #__VA_ARGS__ << "]: "; dbgm(__VA_ARGS__); cout << endl
 endsnippet
 
 snippet divideAndConquerDP "Divide and Conquer DP"
 void rec(int l, int r, int optl, int optr) {
-
 	if (l > r) return;
-
 	int m = (l + r) / 2;
-
 	pi ans = {INF, -1};
-
 	for (int i = optl; i <= min(m - 1, optr); ++i) {
-
 		ans = min(ans, {dp[k - 1][i] + getCost(i + 1, m), i});
-
 	}
-
 	dp[k][m] = ans.ff;
-
 	rec(l, m - 1, optl, ans.ss);
-
 	rec(m + 1, r, ans.ss, optr);
-
 }
 endsnippet
 
 snippet trie "Trie"
 int trie[MAX_N][26], cnt = 1;
 
-
-
 void insert(string s) {
-
 	int cur = 0;
-
 	for (char c: s) {
-
 		if (trie[cur][c - 'a'] == 0) trie[cur][c - 'a'] = cnt++;
-
 		cur = trie[cur][c - 'a'];
-
 	}
-
 }
 endsnippet
 
 snippet mst "Kruskal's Minimum Spanning Tree"
 struct Edge {
-
 	int u, v, w;
-
 	bool operator < (const Edge &e) const {return this->w < e.w;}
-
 };
 
-
-
 struct DSU {
-
 	int numOfComponents;
-
 	vector<int> parent, rank, size;
-
-
 
 	DSU() {}
 
-
-
 	DSU(int n) {
-
 		parent.resize(n + 1); rank.resize(n + 1); size.resize(n + 1);
-
 		numOfComponents = n;
-
 		for (int i = 1; i <= n; ++i) {
-
 			parent[i] = i;
-
 			rank[i] = 0;
-
 			size[i] = 1;
-
 		}
-
 	}
-
-
 
 	int find(int a) {
-
 		return parent[a] == a ? a : (parent[a] = find(parent[a]));
-
 	}
-
-
 
 	void unionSet(int a, int b) {
-
 		a = find(a); b = find(b);
-
 		if (rank[a] > rank[b]) {
-
 			parent[b] = parent[a];
-
 			size[a] += size[b];
-
 		}
-
 		else {
-
 			parent[a] = parent[b];
-
 			size[b] += size[a];
-
 		}
-
 		if (rank[a] == rank[b]) ++rank[b];
-
 		--numOfComponents;
-
 	}
-
 };
 
-
-
 int MST(vector<Edge>& edges) { //returns -1 if a MST is not possible
-
 	DSU dsu(N);
-
 	sort(edges.begin(), edges.end());
-
 	int ret = 0;
-
 	for (int i = 0; i < edges.size() && dsu.numOfComponents > 1; ++i) {
-
 		int u = edges[i].u, v = edges[i].v, w = edges[i].w;
-
 		if (dsu.find(u) != dsu.find(v)) {
-
 			dsu.unionSet(u, v);
-
 			ret += w;
-
 		}
-
 	}
-
 	return dsu.numOfComponents == 1 ? ret : -1;
-
 }
 endsnippet
 
 snippet pointInPolygon "Checks if a Point is in a Polygon"
 pair<int, int> points[MAXN];
 
-
-
 int area(pair<int, int> x, pair<int, int> y, pair<int, int> z) {
-
     return (y.first-x.first)*(z.second-x.second)-(y.second-x.second)*(z.first-x.first);
-
 }
-
-
 
 bool on(pair<int, int> x, pair<int, int> y, pair<int, int> z) {
-
     if (area(x,y,z) != 0) return 0;
-
     return min(x,y) <= z && z <= max(x,y);
-
 }
-
-
 
 double get(pair<int, int> x, pair<int, int> y, int z) {
-
     return double((z-x.second)*y.first+(y.second-z)*x.first)/(y.second-x.second);
-
 }
 
-
-
 bool inPolygon(pair<int, int> z) {
-
     int ans = 0;
-
     for (int i = 0; i < N; ++i) {
-
         pair<int, int> x = points[i], y = points[(i+1) % N];
-
         if (on(x, y, z)) return true;
-
         if (x.second > y.second) swap(x, y);
-
         if (x.second <= z.second && y.second > z.second) {
-
             double t = get(x, y, z.second);
-
             if (t > z.first) ans++;
-
         }
-
     }
-
     if (ans % 2 == 1) return true;
-
     return false;
-
 }
 endsnippet
 
 snippet digitDP "Digit DP"
 int a, b, d, k;
-
 string num;
-
 int memo[MAX_LEN][MAX_K][2];
 
-
-
 int dp(int i, int c, int f) {
-
     if (c > k) return 0;
-
     if (i == num.size()) return (c == k) ? 1 : 0;
-
     if (memo[i][c][f] != -1) return memo[i][c][f];
-
     int res = 0;
-
     int limit = (f == 0 ? num[i] - '0' : 9);
-
     for (int j = 0; j <= limit; ++j) {
-
         int nf = f, nc = c;
-
         if (f == 0 && j < limit) nf = 1;
-
         if (j == d) ++nc;
-
         res += dp(i + 1, nc, nf);
-
     }
-
     return memo[i][c][f] = res;
-
 }
 endsnippet
 
 snippet timer "Timer"
 #define START auto start = high_resolution_clock::now();
-
 #define STARTn start = high_resolution_clock::now();
-
 #define STOP auto stop = high_resolution_clock::now();auto span = duration_cast<milliseconds>(stop - start);cout << "Time: " << span.count() << "ms" << endl;
-
 using namespace std::chrono;
 endsnippet
 
-snippet subset "Loops only through bitmask subsets of mask"
+snippet subset "Loops only through bitmask subsets of "mask""
 for (int subset = mask; ; subset = (subset - 1) & mask) {
-
 	//ans.push_back(subset)
-
 	if (subset == 0) break;
-
 }
 endsnippet
 
 snippet dsu "Union-Find Disjoint Set"
 struct DSU {
-
 	int numOfComponents;
-
 	vector<int> parent, rank, size;
-
-
 
 	DSU() {}
 
-
-
 	DSU(int n) {
-
 		parent.resize(n + 1); rank.resize(n + 1); size.resize(n + 1);
-
 		numOfComponents = n;
-
 		for (int i = 1; i <= n; ++i) {
-
 			parent[i] = i;
-
 			rank[i] = 0;
-
 			size[i] = 1;
-
 		}
-
 	}
-
-
 
 	int find(int a) {
-
 		return parent[a] == a ? a : (parent[a] = find(parent[a]));
-
 	}
-
-
 
 	void unionSet(int a, int b) {
-
 		a = find(a); b = find(b);
-
 		if (rank[a] > rank[b]) {
-
 			parent[b] = parent[a];
-
 			size[a] += size[b];
-
 		}
-
 		else {
-
 			parent[a] = parent[b];
-
 			size[b] += size[a];
-
 		}
-
 		if (rank[a] == rank[b]) ++rank[b];
-
 		--numOfComponents;
-
 	}
-
 };
 endsnippet
 
 snippet sparseTable "Sparse Table"
 int sparse[MAX_N][MAX_LOG];
 
-
-
 void init() {
-
 	for (int i = 0; i < N; ++i) sparse[i][0] = arr[i];
-
 	for (int j = 1; (1 << j) <= N; ++j) {
-
 		for (int i = 0; (i + (1 << j) - 1) < N; ++i) {
-
 			sparse[i][j] = min(sparse[i][j - 1], sparse[i + (1 << (j - 1))][j - 1]);
-
 		}
-
 	}
-
 }
 
-
-
 int query(int l, int r) {
-
 	int j = (int)log2(r - l + 1);
-
 	return min(sparse[l][j], sparse[r - (1 << j) + 1][j]);
-
 }
 endsnippet
 
 snippet cycles "Johnson's Algorithm for finding Simple Cycles on Directed Graphs"
 int counter = 0, numOfSCC = 0;
-
 int pre[MAX_N], low[MAX_N], id[MAX_N];
-
 vector<int> stk;
 
-
-
 int start = 1;
-
 bool blocked[MAX_N];
-
 vector<int> blockMap[MAX_N];
-
 vector<vector<int>> cycles;
 
-
-
 void DFSLowLink(int u) {
-
 	pre[u] = low[u] = counter++;
-
 	stk.push_back(u);
-
 	for (int v: adj[u]) {
-
 		if (v < start) continue; // simulate removing nodes
-
 		if (pre[v] == -1) DFSLowLink(v);
-
 		low[u] = min(low[u], low[v]);
-
 	}
-
 	if (low[u] == pre[u]) {
-
 		while (true) {
-
 			int j = stk.back(); stk.pop_back();
-
 			id[j] = numOfSCC;
-
 			low[j] = N + 1;
-
 			if (u == j) break;
-
 		}
-
 		++numOfSCC;
-
 	}
-
 }
-
-
 
 void unblock(int u) {
-
 	blocked[u] = false;
-
 	for (int v: blockMap[u]) {
-
 		if (v < start || id[u] != id[v]) continue; // check if node has been removed and if it's in the same SCC
-
 		if (blocked[v]) unblock(v);
-
 	}
-
 	blockMap[u].clear();
-
 }
-
-
 
 bool dfs(int u) {
-
 	bool foundCycle = false;
-
 	stk.push_back(u);
-
 	blocked[u] = true;
 
-
-
 	for (int v: adj[u]) {
-
 		if (v < start || id[u] != id[v]) continue; 
-
 		if (v == start) {
-
 			vector<int> cycle = stk;
-
 			cycle.push_back(start);
-
 			cycles.push_back(cycle);
-
 			foundCycle = true;
-
 		}
-
 		else if (!blocked[v]) foundCycle |= dfs(v);
-
 	}
-
-
 
 	if (foundCycle) unblock(u);
-
 	else {
-
 		for (int v: adj[u]) {
-
 			if (v < start || id[u] != id[v]) continue;
-
 			blockMap[v].push_back(u);
-
 		}
-
 	}
-
-
 
 	stk.pop_back();
-
 	return foundCycle;
-
 }
-
-
 
 void nextStart() {
-
 	vector<int> SCCsize(numOfSCC);
-
 	for (int i = start; i <= N; ++i) ++SCCsize[id[i]];
-
 	while (start <= N && SCCsize[id[start]] == 1) ++start; 
-
 }
 
-
-
 // Time - O((E + V) * (c + 1)) where c is the number of cycles
-
 // Space - O(E + V)
-
 // run this method to initiate Johnson's Cycle finding Algorithm
-
 void findCycles() {
-
 	while (start <= N) {
-
 		counter = 0, numOfSCC = 0;
-
 		memset(pre, -1, sizeof pre);
-
 		memset(low, -1, sizeof low);
-
 		memset(id, -1, sizeof id);
-
 		stk.clear();
-
 		for (int i = start; i <= N; ++i) {
-
 			if (pre[i] == -1) DFSLowLink(i);
-
 		}
-
 		nextStart(); // don't run the algorithm on SCCs with size 1
-
 		if (start > N) break; // no SCC with a sz > 1
 
-
-
 		stk.clear();
-
 		memset(blocked, false, sizeof blocked);
-
 		for (int i = 1; i <= N; ++i) blockMap[i].clear();
-
 		dfs(start);
-
 		++start;
-
 	}
-
 }
 endsnippet
 
 snippet gcd "Greatest Common Factor"
 int gcd(int a, int b) {
-
 	return (b == 0 ? a : gcd(b, a % b));
-
 }
 endsnippet
 
@@ -5085,661 +2664,359 @@ endsnippet
 
 snippet lis "Longest Increasing Subsequence"
 int A[MAX_N], L[MAX_N], L_id[MAX_N], prev_id[MAX_N]; //negate values in array A for longest decreasing subsequence
-
 stack<int> stk;
 
-
-
 int LIS() {
-
 	int lis = 0, lisEnd = 0;
-
 	for (int i = 0; i < N; ++i) {
-
 		int pos = lower_bound(L, L + lis, A[i]) - L; //change to upper_bound to go from increasing to non-decreasing
-
 		L[pos] = A[i];
-
 		L_id[pos] = i;
-
 		prev_id[i] = (pos ? L_id[pos - 1] : -1);
-
 		if (pos + 1 > lis) {
-
 			lis = pos + 1;
-
 			lisEnd = i;
-
 		}
-
 	}
-
 	return lis;
-
 }
 
-
-
 void reconstructLIS(int end) {
-
 	int i;
-
 	for (i = end; prev_id[i] >= 0; i = prev_id[i]) stk.push(A[i]);
-
 	stk.push(A[i]);
-
 }
 endsnippet
 
 snippet center "Tree Center"
 bool found[MAX_N];
 
-
-
 pi BFS(int start) { //return {endpoint, longest path from start}
-
 	queue<pi> q; //{node, dist}
-
 	q.push({start, 0});
-
 	pi ret; //answer
-
 	found[start] = true;
-
 	while (!q.empty()) {
-
 		int u = q.front().ff, d = q.front().ss;
-
 		if (d > ret.ss) ret = q.front();
-
 		q.pop();
-
 		for (pi edge: adjList[u]) {
-
 			int v = edge.ff, w = edge.ss;
-
 			if (!found[v]) {
-
 				found[v] = true;
-
 				q.push({v, d + w});
-
 			}
-
 		}
-
 	}
-
 	return ret;
-
 }
-
-
 
 pair<int, pi> diameter() { //returns {diameter, {endpoint, endpoint}}
-
 	memset(found, 0, sizeof found);
-
 	int end1 = BFS(1).ff;
-
 	memset(found, 0, sizeof found);
-
 	pi res = BFS(end1);
-
 	return {res.ss, {end1, res.ff}};
-
 }
-
-
 
 int dia; //diameter
-
 pi cen; //center - {min dist, node}
-
 bool DFS(int u, int p, int end, int d) { //node, parent, second endpoint, distance from first endpoint to u
-
 	if (u == end) return true;
-
 	for (pi edge: adjList[u]) {
-
 		int v = edge.ff, w = edge.ss;
-
 		if (v == p) continue;
-
 		if (DFS(v, u, end, d + w)) {
-
 			if (max(d, dia - d) < cen.ff) {
-
 				cen.ff = max(d, dia - d);
-
 				cen.ss = u;
-
 			}
-
 			return true;
-
 		}
-
 	}
-
 	return false;
-
 }
 
-
-
 pi center() { //returns {center, maximum distance from center to other node}
-
 	auto temp = diameter();
-
 	dia = temp.ff;
-
 	cen = {dia, -1};
-
 	DFS(temp.ss.ff, -1, temp.ss.ss, 0);
-
 	return {cen.ss, cen.ff};
-
 }
 endsnippet
 
 snippet cht "Static Convex Hull Optimization"
 struct Sol {
-
 	ll m;
-
 	ll b;
 
-
-
 	ll compute(ll x) {
-
 		return m * x + b;
-
 	}
-
-
 
 	ll intersect(Sol r) {
-
 		return (ld)(this->b - r.b)/(r.m - this->m);
-
 	}
-
 };
 
-
-
 class CHT {
-
 public: 
-
 	Sol hull[MAX_N]; //deque
-
 	int p1, p2; //front and back pointers, respectively 
 
-
-
 	void insert(Sol part) {
-
 		while (p2 - p1 >= 2 && hull[p2 - 2].intersect(hull[p2 - 1]) >= hull[p2 - 2].intersect(part)) --p2;
-
 		hull[p2++] = part;
-
 	}
-
-
 
 	//static queries
-
 	ll query(ll x) {
-
 		while (p1 + 1 < p2 && hull[p1].compute(x) >= hull[p1 + 1].compute(x)) ++p1;
-
 		return hull[p1].compute(x);
-
 	}
 
-
-
 	//dynamic queries
-
 	/*ll query(ll x) {
-
 		int lo = p1, hi = p2 - 2;
-
 		if (p1 + 1 == p2) return hull[p1].compute(x);
-
 		if (x < hull[p2 - 1].intersect(hull[p2 - 2])) return hull[p2 - 1].compute(x);
-
 		while (hi - lo > 1) {
-
 			int m = (lo + hi) / 2;
-
 			if (x >= hull[m].intersect(hull[m + 1])) hi = m;
-
 			else lo = m;
-
 		}
-
 		return hull[hi].compute(x);
-
 	}*/
-
 };
 endsnippet
 
 snippet flow "Max Flow Ford Fulkerson"
 int N, source, sink;
-
 int adj[MAX_N][MAX_N];
-
 bool seen[MAX_N];
 
-
-
 int dfs(int u, int amount) {
-
 	if (u == sink) return amount;
-
 	seen[u] = true;
-
 	for (int v = 1; v <= N; ++v) {
-
 		if (adj[u][v] > 0 && !seen[v]) {
-
 			int sent = dfs(v, min(amount, adj[u][v]));
-
 			if (sent > 0) {
-
 				adj[u][v] -= sent;
-
 				adj[v][u] += sent;
-
 				return sent;
-
 			}
-
 		}
-
 	}
-
-
 
 	return 0;
-
 }
 
-
-
 int run() {
-
 	int total = 0;
-
 	int sent = -1;
 
-
-
 	while (sent != 0) {
-
 		fill(seen, seen + N, false);
-
 		sent = dfs(source, (1 << 30));
-
 		total += sent;
-
 	}
 
-
-
 	return total;
-
 }
 endsnippet
 
 snippet kmp "Knuth Morris Pratt Pattern Matching"
 vector<int> precompute(string s) {
-
 	vector<int> lps(s.size());
-
 	int j = 0;
-
 	for (int i = 1; i < s.size();) {
-
 		if (s[i] == s[j]) lps[i] = ++j, ++i;
-
 		else if (j != 0) j = lps[j - 1];
-
 		else lps[i] = 0, ++i;
-
 	}
-
 	return lps;
-
 }
 
-
-
 bool KMP(string s, string p) { //s = text, p = pattern
-
 	vector<int> lps = precompute(p);
-
 	int i = 0, j = 0;
-
 	while (i < s.size() && j < p.size()) {
-
 		if (s[i] == p[j]) ++i, ++j;
-
 		else if (j != 0) j = lps[j - 1];
-
 		else ++i;
-
 	}
-
 	return j == p.size();
-
 }
 endsnippet
 
 snippet mst "Prim's Minimum Spanning Tree"
 int dist[MAX_N];
-
 bool used[MAX_N];
 
-
-
 int MST() {
-
 	fill(dist, dist + N + 1, INF); dist[1] = 0;
-
 	int ans = 0;
-
 	for (int i = 1; i <= N; ++i) {
-
 		int mini = -1;
-
 		for (int j = 1; j <= N; ++j) {
-
 			if (!used[j] && (mini == -1 || dist[j] < dist[mini])) mini = j;
-
 		}
-
 		ans += dist[mini];
-
 		used[mini] = true;
-
 		for (int j = 1; j <= N; ++j) dist[j] = min(dist[j], adjMat[mini][j]);
-
 	}
-
 	return ans;
-
 }
 endsnippet
 
 snippet pairOperations "Pair Operations"
 pair<int, int> operator+(const pair<int, int>& l, const pair<int, int>& r) {
-
 	return {l.first + r.first, l.second + r.second};
-
 }
 
-
-
 pair<int, int> operator+=(pair<int, int>& l, const pi& r) {
-
 	return l = l + r;
-
 }
 endsnippet
 
 snippet pragma "Pragma Speed Ups"
 #pragma comment(linker, "/stack:200000000") //can slow down program
-
 #pragma GCC optimize("Ofast") //only use when trying to brute force with a lot of simple 'for' loops
-
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native") //can slow down program
-
 #pragma GCC optimize ("O3") //used most often
-
 #pragma GCC target ("sse4") //used most often
 endsnippet
 
 snippet bipartite "Bipartite Graph Check"
 bool isBipartite = true;
-
 int color[MAX_N];
-
 void dfs(int u, int c) {
-
 	color[u] = c;
-
 	for (auto v: adjList[u]) {
-
 		if (color[v] == 0) dfs(v, 3 - c);
-
 		if (color[u] == color[v]) isBipartite = false;
-
 	}
-
 }
 endsnippet
 
 snippet mo "Mo's Algorithm"
 int block(int i) {return i/(int)sqrt(MAX_N);}
 
-
-
 struct Query {
-
     int idx, l, r;
 
-
-
     bool operator < (const Query& q) const {
-
         if (block(this->l) == block(q.l)) return this->r < q.r;
-
         return block(this->l) < block(q.l);
-
     }
-
 };
 
-
-
 int N, Q;
-
 int total;
-
 int arr[MAX_N], cnt[MAX_N], ans[MAX_Q];
-
 Query queries[MAX_Q];
 
-
-
 void add(int pos) {
-
     ++cnt[arr[pos]];
-
     if (cnt[arr[pos]] == 1) ++total;
-
 }
-
-
 
 void remove(int pos) {
-
     --cnt[arr[pos]];
-
     if (cnt[arr[pos]] == 0) --total;
-
 }
 
-
-
 void solve() {
-
     sort(queries, queries + Q);
 
-
-
     int currL = 0, currR = -1;
-
     for (int i = 0; i < Q; ++i) {
-
         int l = queries[i].l, r = queries[i].r;
-
         while (currL < l) remove(currL++);
-
         while (currL > l) add(--currL);
-
         while (currR < r) add(++currR);
-
         while (currR > r) remove(currR--);
-
         ans[queries[i].idx] = total;
-
     }
-
 }
 endsnippet
 
 snippet eulerTour "Euler's Tour/Circuit/Cycle"
 int degree[MAXN];
-
 stack<int> tour;
 
-
-
 bool checkDegree() {
-
 	for (int i = 1; i <= N; ++i) if (degree[i] % 2 == 1) return false;
-
 	return true;
-
 }
 
-
-
 void eulerTour(int u) {
-
 	if (degree[u] == 0) {
-
 		tour.push(u);
-
 		return;
-
 	}
-
-
 
 	while (degree[u]) {
-
 		int v = 1;
-
 		while (!adjMat[u][v]) ++v;
-
 		--adjMat[u][v]; --adjMat[v][u]; --degree[u]; --degree[v];
-
 		eulerTour(v);
-
 	}
 
-
-
 	tour.push(u);
-
 }
 endsnippet
 
 snippet longestPath "Longest Path on DAG"
 //must do a topological sort before running longest path
-
 fill(dist, dist + MAXN, -1);
-
 dist[1] = 0;
-
 for (int u = 1; u <= N; ++u) {
-
 	if (dist[u] != -1) {
-
 		for (int i = 0; i < adjList[u].size(); ++i) {
-
 			pair<int, int> v = adjList[u][i];
-
 			dist[v.first] = max(dist[v.first], dist[u] + v.second);
-
 		}
-
 	}
-
 }
 endsnippet
 
 snippet base "Base Conversion"
 int val(char c) {
-
 	if ('0' <= c && c <= '9') return c - '0';
-
 	return c - 'A' + 10;
-
 }
-
-
 
 int reVal(int num) {
-
 	if (0 <= num && num <= 9) return (char)(num + '0');
-
 	return (char)(num - 10 + 'A');
-
 }
 
-
-
 string baseChange(string num, int from_base, int to_base) {
-
 	ll base10 = 0, power = 1;
-
 	for (int i = num.size() - 1; i >= 0; --i) {
-
 		base10 += val(num[i]) * power;
-
 		power *= from_base;
-
 	}
-
 	char res[100];
-
 	int idx = 0;
-
 	while (base10 > 0) {
-
 		res[idx++] = reVal(base10 % to_base);
-
 		base10 /= to_base;
-
 	}
-
 	res[idx] = '\0';
-
 	string ret(res);
-
 	reverse(ret.begin(), ret.end());
-
 	return ret;
-
 }
 endsnippet
 
 snippet tc "Test Cases"
 int t; cin >> t;
-
 for (int tc = 1; tc <= t; ++tc) {
-
 	$0
-
 }
 endsnippet
 
