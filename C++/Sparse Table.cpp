@@ -2,7 +2,7 @@ struct SparseTable {
 	int N;
 	vector<vector<int>> table;
 
-	SparseTable(vector<int> v) : SparseTable((int)v.size()) {
+	SparseTable(vector<int>& v) : SparseTable((int)v.size()) {
 		for (int i = 0; i < N; ++i) table[i][0] = v[i];
 		init();
 	}
